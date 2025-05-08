@@ -5,7 +5,7 @@ This repository contains Kodi addons for enhancing your entertainment experience
 ## Quick Downloads
 
 👉 **[DOWNLOAD REPOSITORY.SEEDR-1.0.0.ZIP](repository.seedr/repository.seedr-1.0.0.zip)** - Install this first!  
-👉 **[DOWNLOAD PLUGIN.VIDEO.SEEDR-1.0.4.ZIP](plugin.video.seedr/plugin.video.seedr-1.0.4.zip)** - Seedr addon
+👉 **[DOWNLOAD PLUGIN.VIDEO.SEEDR-1.0.5.ZIP](plugin.video.seedr/plugin.video.seedr-1.0.5.zip)** - Seedr addon
 
 ## Repository Navigation
 
@@ -13,7 +13,7 @@ This repository contains Kodi addons for enhancing your entertainment experience
 <img src="icons/folder.gif" alt="[DIR]"> <a href="repository.seedr/">repository.seedr/</a>
 <img src="icons/folder.gif" alt="[DIR]"> <a href="plugin.video.seedr/">plugin.video.seedr/</a>
 <img src="icons/compressed.gif" alt="[ZIP]"> <a href="repository.seedr/repository.seedr-1.0.0.zip">repository.seedr-1.0.0.zip</a>
-<img src="icons/compressed.gif" alt="[ZIP]"> <a href="plugin.video.seedr/plugin.video.seedr-1.0.4.zip">plugin.video.seedr-1.0.4.zip</a>
+<img src="icons/compressed.gif" alt="[ZIP]"> <a href="plugin.video.seedr/plugin.video.seedr-1.0.5.zip">plugin.video.seedr-1.0.5.zip</a>
 </pre>
 
 ## Downloads
@@ -25,8 +25,8 @@ This repository contains Kodi addons for enhancing your entertainment experience
 
 ### Addon
 
-- [plugin.video.seedr-1.0.4.zip](plugin.video.seedr/plugin.video.seedr-1.0.4.zip) - Seedr Addon ZIP file
-- [plugin.video.seedr-1.0.4.zip.md5](plugin.video.seedr/plugin.video.seedr-1.0.4.zip.md5) - MD5 Checksum: `f6b390d3c846bc391a826b99310644df`
+- [plugin.video.seedr-1.0.5.zip](plugin.video.seedr/plugin.video.seedr-1.0.5.zip) - Seedr Addon ZIP file
+- [plugin.video.seedr-1.0.5.zip.md5](plugin.video.seedr/plugin.video.seedr-1.0.5.zip.md5) - MD5 Checksum: `e916deecc28cade4dd6563ec090f615b`
 
 ## Available Addons
 
@@ -41,6 +41,12 @@ Stream videos, music, and images from your Seedr cloud storage directly to Kodi.
 - View image files
 - Support for SRT subtitles
 - Automatic subtitle matching for videos
+
+**What's New in v1.0.5:**
+
+- Simplified audio playback to most basic form
+- Streamlined approach with direct audio playback
+- Removed excess code for better reliability
 
 **What's New in v1.0.4:**
 
