@@ -483,15 +483,23 @@ def handle_playback(mode, args, settings, addon_handle):
                     log("Failed to get video URL", xbmc.LOGERROR)
                     show_auto_close_notification(addonname, "Failed to get video URL. Please try again.")
             elif data.get('is_audio', False):
-                # Get the audio streaming URL
-                log("Fetching audio streaming URL")
-                audio_data = call_api(f'/api/v0.1/p/media/fs/item/{file_id}/video/url', settings['access_token'])
-                log(f"Audio URL response: {audio_data}")
+                # Get the audio streaming URL - Use direct download instead of video API
+                log("Fetching audio streaming URL", xbmc.LOGINFO)
                 
-                if audio_data and not audio_data.get('error'):
+                # First try direct file download
+                audio_data = call_api(f'/api/v0.1/p/fs/file/{file_id}/download', settings['access_token'])
+                log(f"Audio download URL response: {audio_data}", xbmc.LOGINFO)
+                
+                if not audio_data or not audio_data.get('url'):
+                    # Fallback to media/video API if download fails
+                    log("Fallback to media/video API for audio", xbmc.LOGINFO)
+                    audio_data = call_api(f'/api/v0.1/p/media/fs/item/{file_id}/video/url', settings['access_token'])
+                    log(f"Media API response for audio: {audio_data}", xbmc.LOGINFO)
+                
+                if audio_data and 'url' in audio_data and not audio_data.get('error'):
                     url = audio_data.get('url')
                     if url:
-                        log(f"Playing audio URL: {url}")
+                        log(f"Playing audio URL: {url}", xbmc.LOGINFO)
                         
                         # Get folder data to find other audio files for playlist
                         folder_id = data.get('folder_id')
@@ -501,12 +509,22 @@ def handle_playback(mode, args, settings, addon_handle):
                         playlist.clear()  # Clear any existing playlist
                         
                         # Add the current file to the playlist first
+                        file_name = data.get('name', 'Unknown Audio')
                         current_li = xbmcgui.ListItem(path=url)
-                        current_li.setInfo('music', {'title': data.get('name', 'Unknown Audio')})
+                        # Use the InfoTagMusic approach to avoid deprecation warning
+                        info_tag = current_li.getMusicInfoTag()
+                        info_tag.setTitle(file_name)
+                        info_tag.setMediaType('song')
+                        
                         current_li.setArt({
                             'icon': 'DefaultAudio.png',
                             'thumb': 'DefaultAudio.png'
                         })
+                        
+                        # First resolve the URL for the current item
+                        xbmcplugin.setResolvedUrl(addon_handle, True, current_li)
+                        
+                        # Now add the direct URL to the playlist
                         playlist.add(url, current_li)
                         
                         # If we have a folder ID, get all audio files in the folder
@@ -538,16 +556,21 @@ def handle_playback(mode, args, settings, addon_handle):
                                         
                                         log(f"Adding next audio file to playlist: {next_name}", xbmc.LOGINFO)
                                         
-                                        # Get streaming URL for this file
+                                        # Get streaming URL for this file directly - like in the working example
                                         next_audio_data = call_api(f'/api/v0.1/p/media/fs/item/{next_file_id}/video/url', settings['access_token'])
                                         if next_audio_data and 'url' in next_audio_data:
                                             next_url = next_audio_data['url']
                                             next_li = xbmcgui.ListItem(next_name)
-                                            next_li.setInfo('music', {'title': next_name})
+                                            # Use the InfoTagMusic approach to avoid deprecation warning
+                                            next_info_tag = next_li.getMusicInfoTag()
+                                            next_info_tag.setTitle(next_name)
+                                            next_info_tag.setMediaType('song')
+                                            
                                             next_li.setArt({
                                                 'icon': 'DefaultAudio.png',
                                                 'thumb': 'DefaultAudio.png'
                                             })
+                                            # Add the direct URL to playlist, not a plugin URL
                                             playlist.add(next_url, next_li)
                                             added_files += 1
                                 
@@ -561,16 +584,21 @@ def handle_playback(mode, args, settings, addon_handle):
                                         
                                         log(f"Adding previous audio file to playlist: {next_name}", xbmc.LOGINFO)
                                         
-                                        # Get streaming URL for this file
+                                        # Get streaming URL for this file directly - like in the working example
                                         next_audio_data = call_api(f'/api/v0.1/p/media/fs/item/{next_file_id}/video/url', settings['access_token'])
                                         if next_audio_data and 'url' in next_audio_data:
                                             next_url = next_audio_data['url']
                                             next_li = xbmcgui.ListItem(next_name)
-                                            next_li.setInfo('music', {'title': next_name})
+                                            # Use the InfoTagMusic approach to avoid deprecation warning
+                                            next_info_tag = next_li.getMusicInfoTag()
+                                            next_info_tag.setTitle(next_name)
+                                            next_info_tag.setMediaType('song')
+                                            
                                             next_li.setArt({
                                                 'icon': 'DefaultAudio.png',
                                                 'thumb': 'DefaultAudio.png'
                                             })
+                                            # Add the direct URL to playlist, not a plugin URL
                                             playlist.add(next_url, next_li)
                                             added_files += 1
                                 
@@ -588,7 +616,7 @@ def handle_playback(mode, args, settings, addon_handle):
                 else:
                     li = xbmcgui.ListItem()
                     xbmcplugin.setResolvedUrl(addon_handle, False, li)
-                    # log("Failed to get audio URL", xbmc.LOGERROR)
+                    log("Failed to get audio URL", xbmc.LOGERROR)
                     show_auto_close_notification(addonname, "Failed to get audio URL. Please try again.")
             else:
                 # Handle image files - directly use ShowPicture

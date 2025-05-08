@@ -5,7 +5,7 @@ This repository contains Kodi addons for enhancing your entertainment experience
 ## Quick Downloads
 
 👉 **[DOWNLOAD REPOSITORY.SEEDR-1.0.0.ZIP](repository.seedr/repository.seedr-1.0.0.zip)** - Install this first!  
-👉 **[DOWNLOAD PLUGIN.VIDEO.SEEDR-1.0.2.ZIP](plugin.video.seedr/plugin.video.seedr-1.0.2.zip)** - Seedr addon
+👉 **[DOWNLOAD PLUGIN.VIDEO.SEEDR-1.0.3.ZIP](plugin.video.seedr/plugin.video.seedr-1.0.3.zip)** - Seedr addon
 
 ## Repository Navigation
 
@@ -13,7 +13,7 @@ This repository contains Kodi addons for enhancing your entertainment experience
 <img src="icons/folder.gif" alt="[DIR]"> <a href="repository.seedr/">repository.seedr/</a>
 <img src="icons/folder.gif" alt="[DIR]"> <a href="plugin.video.seedr/">plugin.video.seedr/</a>
 <img src="icons/compressed.gif" alt="[ZIP]"> <a href="repository.seedr/repository.seedr-1.0.0.zip">repository.seedr-1.0.0.zip</a>
-<img src="icons/compressed.gif" alt="[ZIP]"> <a href="plugin.video.seedr/plugin.video.seedr-1.0.2.zip">plugin.video.seedr-1.0.2.zip</a>
+<img src="icons/compressed.gif" alt="[ZIP]"> <a href="plugin.video.seedr/plugin.video.seedr-1.0.3.zip">plugin.video.seedr-1.0.3.zip</a>
 </pre>
 
 ## Downloads
@@ -25,8 +25,8 @@ This repository contains Kodi addons for enhancing your entertainment experience
 
 ### Addon
 
-- [plugin.video.seedr-1.0.2.zip](plugin.video.seedr/plugin.video.seedr-1.0.2.zip) - Seedr Addon ZIP file
-- [plugin.video.seedr-1.0.2.zip.md5](plugin.video.seedr/plugin.video.seedr-1.0.2.zip.md5) - MD5 Checksum: `fc15293e4721321b1cd357da1db31121`
+- [plugin.video.seedr-1.0.3.zip](plugin.video.seedr/plugin.video.seedr-1.0.3.zip) - Seedr Addon ZIP file
+- [plugin.video.seedr-1.0.3.zip.md5](plugin.video.seedr/plugin.video.seedr-1.0.3.zip.md5) - MD5 Checksum: `bd220c661c8ff81f8fddeb68b6db2b2b`
 
 ## Available Addons
 
@@ -41,6 +41,14 @@ Stream videos, music, and images from your Seedr cloud storage directly to Kodi.
 - View image files
 - Support for SRT subtitles
 - Automatic subtitle matching for videos
+
+**What's New in v1.0.3:**
+
+- Enhanced audio playback with improved playlist handling
+- Fixed Kodi API deprecation warnings for audio files
+- Implemented direct URL playback for audio playlists
+- Added fallback to direct download URLs for audio files
+- Updated InfoTagMusic approach for newer Kodi versions
 
 **What's New in v1.0.2:**
 

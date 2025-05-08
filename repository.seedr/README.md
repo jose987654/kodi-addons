@@ -5,7 +5,7 @@ This repository contains the Seedr addon for Kodi.
 ## Quick Downloads
 
 👉 **[DOWNLOAD REPOSITORY.SEEDR-1.0.0.ZIP](repository.seedr-1.0.0.zip)** - Install this first!  
-👉 **[DOWNLOAD PLUGIN.VIDEO.SEEDR-1.0.1.ZIP](../plugin.video.seedr/plugin.video.seedr-1.0.1.zip)** - Seedr addon
+👉 **[DOWNLOAD PLUGIN.VIDEO.SEEDR-1.0.2.ZIP](../plugin.video.seedr/plugin.video.seedr-1.0.2.zip)** - Seedr addon
 
 ## Navigation
 
@@ -28,10 +28,11 @@ This repository contains the Seedr addon for Kodi.
 
 ## Available Addons
 
-- **Seedr v1.0.1** - Stream videos, music, and images from your Seedr cloud storage directly to Kodi
-  - Improved audio file playback
-  - Better support for various audio formats
-  - Fixed playlist navigation issues
+- **Seedr v1.0.2** - Stream videos, music, and images from your Seedr cloud storage directly to Kodi
+  - Fixed audio playback issues with direct files
+  - Improved audio playlist handling
+  - Better handling of audio formats
+  - Fixed issue with audio files not playing via plugin URL
 
 ## Repository Structure
 
