@@ -483,15 +483,23 @@ def handle_playback(mode, args, settings, addon_handle):
                     log("Failed to get video URL", xbmc.LOGERROR)
                     show_auto_close_notification(addonname, "Failed to get video URL. Please try again.")
             elif data.get('is_audio', False):
-                # Get the audio streaming URL
-                log("Fetching audio streaming URL")
-                audio_data = call_api(f'/api/v0.1/p/media/fs/item/{file_id}/video/url', settings['access_token'])
-                log(f"Audio URL response: {audio_data}")
+                # Get the audio streaming URL - Use direct download instead of video API
+                log("Fetching audio streaming URL", xbmc.LOGINFO)
                 
-                if audio_data and not audio_data.get('error'):
+                # First try direct file download
+                audio_data = call_api(f'/api/v0.1/p/fs/file/{file_id}/download', settings['access_token'])
+                log(f"Audio download URL response: {audio_data}", xbmc.LOGINFO)
+                
+                if not audio_data or not audio_data.get('url'):
+                    # Fallback to media/video API if download fails
+                    log("Fallback to media/video API for audio", xbmc.LOGINFO)
+                    audio_data = call_api(f'/api/v0.1/p/media/fs/item/{file_id}/video/url', settings['access_token'])
+                    log(f"Media API response for audio: {audio_data}", xbmc.LOGINFO)
+                
+                if audio_data and 'url' in audio_data and not audio_data.get('error'):
                     url = audio_data.get('url')
                     if url:
-                        log(f"Playing audio URL: {url}")
+                        log(f"Playing audio URL: {url}", xbmc.LOGINFO)
                         
                         # Get folder data to find other audio files for playlist
                         folder_id = data.get('folder_id')
@@ -503,10 +511,30 @@ def handle_playback(mode, args, settings, addon_handle):
                         # Add the current file to the playlist first
                         current_li = xbmcgui.ListItem(path=url)
                         current_li.setInfo('music', {'title': data.get('name', 'Unknown Audio')})
+                        current_li.setProperty('IsPlayable', 'true')
+                        current_li.setMimeType('audio/mpeg')  # Default audio MIME type
+                        
+                        # Check file extension and set appropriate MIME type
+                        if file_ext.endswith('.mp3'):
+                            current_li.setMimeType('audio/mpeg')
+                        elif file_ext.endswith('.m4a') or file_ext.endswith('.aac'):
+                            current_li.setMimeType('audio/aac')
+                        elif file_ext.endswith('.flac'):
+                            current_li.setMimeType('audio/flac')
+                        elif file_ext.endswith('.wav'):
+                            current_li.setMimeType('audio/wav')
+                        elif file_ext.endswith('.ogg'):
+                            current_li.setMimeType('audio/ogg')
+                            
                         current_li.setArt({
                             'icon': 'DefaultAudio.png',
                             'thumb': 'DefaultAudio.png'
                         })
+                        
+                        # First resolve the URL for the current file
+                        xbmcplugin.setResolvedUrl(addon_handle, True, current_li)
+                        
+                        # Now handle playlist
                         playlist.add(url, current_li)
                         
                         # If we have a folder ID, get all audio files in the folder
@@ -538,17 +566,43 @@ def handle_playback(mode, args, settings, addon_handle):
                                         
                                         log(f"Adding next audio file to playlist: {next_name}", xbmc.LOGINFO)
                                         
-                                        # Get streaming URL for this file
-                                        next_audio_data = call_api(f'/api/v0.1/p/media/fs/item/{next_file_id}/video/url', settings['access_token'])
+                                        # Try to get direct download URL for this file
+                                        next_audio_data = call_api(f'/api/v0.1/p/fs/file/{next_file_id}/download', settings['access_token'])
+                                        
+                                        # Fallback to media API if download fails
+                                        if not next_audio_data or not next_audio_data.get('url'):
+                                            next_audio_data = call_api(f'/api/v0.1/p/media/fs/item/{next_file_id}/video/url', settings['access_token'])
+                                        
                                         if next_audio_data and 'url' in next_audio_data:
                                             next_url = next_audio_data['url']
                                             next_li = xbmcgui.ListItem(next_name)
                                             next_li.setInfo('music', {'title': next_name})
+                                            next_li.setProperty('IsPlayable', 'true')
+                                            
+                                            # Set the appropriate MIME type based on extension
+                                            next_file_ext = next_name.lower()
+                                            if next_file_ext.endswith('.mp3'):
+                                                next_li.setMimeType('audio/mpeg')
+                                            elif next_file_ext.endswith('.m4a') or next_file_ext.endswith('.aac'):
+                                                next_li.setMimeType('audio/aac')
+                                            elif next_file_ext.endswith('.flac'):
+                                                next_li.setMimeType('audio/flac')
+                                            elif next_file_ext.endswith('.wav'):
+                                                next_li.setMimeType('audio/wav')
+                                            elif next_file_ext.endswith('.ogg'):
+                                                next_li.setMimeType('audio/ogg')
+                                            else:
+                                                next_li.setMimeType('audio/mpeg')  # Default
+                                                
                                             next_li.setArt({
                                                 'icon': 'DefaultAudio.png',
                                                 'thumb': 'DefaultAudio.png'
                                             })
-                                            playlist.add(next_url, next_li)
+                                            
+                                            # Create playlist URL with plugin format to ensure playability
+                                            playlist_url = f"plugin://{addon.getAddonInfo('id')}/?mode=file&file_id={next_file_id}"
+                                            playlist.add(playlist_url, next_li)
+                                            
                                             added_files += 1
                                 
                                 # Then add files before the current one (to loop back)
@@ -561,17 +615,43 @@ def handle_playback(mode, args, settings, addon_handle):
                                         
                                         log(f"Adding previous audio file to playlist: {next_name}", xbmc.LOGINFO)
                                         
-                                        # Get streaming URL for this file
-                                        next_audio_data = call_api(f'/api/v0.1/p/media/fs/item/{next_file_id}/video/url', settings['access_token'])
+                                        # Try to get direct download URL for this file
+                                        next_audio_data = call_api(f'/api/v0.1/p/fs/file/{next_file_id}/download', settings['access_token'])
+                                        
+                                        # Fallback to media API if download fails
+                                        if not next_audio_data or not next_audio_data.get('url'):
+                                            next_audio_data = call_api(f'/api/v0.1/p/media/fs/item/{next_file_id}/video/url', settings['access_token'])
+                                            
                                         if next_audio_data and 'url' in next_audio_data:
                                             next_url = next_audio_data['url']
                                             next_li = xbmcgui.ListItem(next_name)
                                             next_li.setInfo('music', {'title': next_name})
+                                            next_li.setProperty('IsPlayable', 'true')
+                                            
+                                            # Set the appropriate MIME type based on extension
+                                            next_file_ext = next_name.lower()
+                                            if next_file_ext.endswith('.mp3'):
+                                                next_li.setMimeType('audio/mpeg')
+                                            elif next_file_ext.endswith('.m4a') or next_file_ext.endswith('.aac'):
+                                                next_li.setMimeType('audio/aac')
+                                            elif next_file_ext.endswith('.flac'):
+                                                next_li.setMimeType('audio/flac')
+                                            elif next_file_ext.endswith('.wav'):
+                                                next_li.setMimeType('audio/wav')
+                                            elif next_file_ext.endswith('.ogg'):
+                                                next_li.setMimeType('audio/ogg')
+                                            else:
+                                                next_li.setMimeType('audio/mpeg')  # Default
+                                                
                                             next_li.setArt({
                                                 'icon': 'DefaultAudio.png',
                                                 'thumb': 'DefaultAudio.png'
                                             })
-                                            playlist.add(next_url, next_li)
+                                            
+                                            # Create playlist URL with plugin format to ensure playability
+                                            playlist_url = f"plugin://{addon.getAddonInfo('id')}/?mode=file&file_id={next_file_id}"
+                                            playlist.add(playlist_url, next_li)
+                                            
                                             added_files += 1
                                 
                                 log(f"Added {added_files} audio files to playlist", xbmc.LOGINFO)
@@ -588,7 +668,7 @@ def handle_playback(mode, args, settings, addon_handle):
                 else:
                     li = xbmcgui.ListItem()
                     xbmcplugin.setResolvedUrl(addon_handle, False, li)
-                    # log("Failed to get audio URL", xbmc.LOGERROR)
+                    log("Failed to get audio URL", xbmc.LOGERROR)
                     show_auto_close_notification(addonname, "Failed to get audio URL. Please try again.")
             else:
                 # Handle image files - directly use ShowPicture

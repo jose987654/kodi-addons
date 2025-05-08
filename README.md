@@ -5,7 +5,7 @@ This repository contains Kodi addons for enhancing your entertainment experience
 ## Quick Downloads
 
 👉 **[DOWNLOAD REPOSITORY.SEEDR-1.0.0.ZIP](repository.seedr/repository.seedr-1.0.0.zip)** - Install this first!  
-👉 **[DOWNLOAD PLUGIN.VIDEO.SEEDR-1.0.0.ZIP](plugin.video.seedr/plugin.video.seedr-1.0.0.zip)** - Seedr addon
+👉 **[DOWNLOAD PLUGIN.VIDEO.SEEDR-1.0.1.ZIP](plugin.video.seedr/plugin.video.seedr-1.0.1.zip)** - Seedr addon
 
 ## Repository Navigation
 
@@ -13,7 +13,7 @@ This repository contains Kodi addons for enhancing your entertainment experience
 <img src="icons/folder.gif" alt="[DIR]"> <a href="repository.seedr/">repository.seedr/</a>
 <img src="icons/folder.gif" alt="[DIR]"> <a href="plugin.video.seedr/">plugin.video.seedr/</a>
 <img src="icons/compressed.gif" alt="[ZIP]"> <a href="repository.seedr/repository.seedr-1.0.0.zip">repository.seedr-1.0.0.zip</a>
-<img src="icons/compressed.gif" alt="[ZIP]"> <a href="plugin.video.seedr/plugin.video.seedr-1.0.0.zip">plugin.video.seedr-1.0.0.zip</a>
+<img src="icons/compressed.gif" alt="[ZIP]"> <a href="plugin.video.seedr/plugin.video.seedr-1.0.1.zip">plugin.video.seedr-1.0.1.zip</a>
 </pre>
 
 ## Downloads
@@ -25,8 +25,8 @@ This repository contains Kodi addons for enhancing your entertainment experience
 
 ### Addon
 
-- [plugin.video.seedr-1.0.0.zip](plugin.video.seedr/plugin.video.seedr-1.0.0.zip) - Seedr Addon ZIP file
-- [plugin.video.seedr-1.0.0.zip.md5](plugin.video.seedr/plugin.video.seedr-1.0.0.zip.md5) - MD5 Checksum: `961129fde67db72695d6f5eacf5186e0`
+- [plugin.video.seedr-1.0.1.zip](plugin.video.seedr/plugin.video.seedr-1.0.1.zip) - Seedr Addon ZIP file
+- [plugin.video.seedr-1.0.1.zip.md5](plugin.video.seedr/plugin.video.seedr-1.0.1.zip.md5) - MD5 Checksum: `ea04372768f0f7baa863546b00b16b18`
 
 ## Available Addons
 
@@ -41,6 +41,13 @@ Stream videos, music, and images from your Seedr cloud storage directly to Kodi.
 - View image files
 - Support for SRT subtitles
 - Automatic subtitle matching for videos
+
+**What's New in v1.0.1:**
+
+- Improved audio file playback
+- Better support for various audio formats
+- Fixed playlist navigation issues
+- More robust playback mechanisms
 
 ## Installation
 
