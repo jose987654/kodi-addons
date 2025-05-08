@@ -1,0 +1,74 @@
+# Kodi Addons Repository
+
+This repository contains Kodi addons for enhancing your entertainment experience.
+
+## Quick Downloads
+
+👉 **[DOWNLOAD REPOSITORY.SEEDR-1.0.0.ZIP](repository.seedr/repository.seedr-1.0.0.zip)** - Install this first!  
+👉 **[DOWNLOAD PLUGIN.VIDEO.SEEDR-1.0.0.ZIP](plugin.video.seedr/plugin.video.seedr-1.0.0.zip)** - Seedr addon
+
+## Repository Navigation
+
+<pre>
+<img src="icons/folder.gif" alt="[DIR]"> <a href="repository.seedr/">repository.seedr/</a>
+<img src="icons/folder.gif" alt="[DIR]"> <a href="plugin.video.seedr/">plugin.video.seedr/</a>
+<img src="icons/compressed.gif" alt="[ZIP]"> <a href="repository.seedr/repository.seedr-1.0.0.zip">repository.seedr-1.0.0.zip</a>
+<img src="icons/compressed.gif" alt="[ZIP]"> <a href="plugin.video.seedr/plugin.video.seedr-1.0.0.zip">plugin.video.seedr-1.0.0.zip</a>
+</pre>
+
+## Downloads
+
+### Repository
+
+- [repository.seedr-1.0.0.zip](repository.seedr/repository.seedr-1.0.0.zip) - Repository ZIP file
+- [repository.seedr-1.0.0.zip.md5](repository.seedr/repository.seedr-1.0.0.zip.md5) - MD5 Checksum: `c4fca73fff5939decf1ca3651c98c3b5`
+
+### Addon
+
+- [plugin.video.seedr-1.0.0.zip](plugin.video.seedr/plugin.video.seedr-1.0.0.zip) - Seedr Addon ZIP file
+- [plugin.video.seedr-1.0.0.zip.md5](plugin.video.seedr/plugin.video.seedr-1.0.0.zip.md5) - MD5 Checksum: `961129fde67db72695d6f5eacf5186e0`
+
+## Available Addons
+
+### Seedr Addon
+
+Stream videos, music, and images from your Seedr cloud storage directly to Kodi.
+
+**Features:**
+
+- Stream video files from your Seedr account
+- Listen to audio files with playlist support
+- View image files
+- Support for SRT subtitles
+- Automatic subtitle matching for videos
+
+## Installation
+
+### Repository Installation
+
+1. Download the repository zip file ([repository.seedr-1.0.0.zip](repository.seedr/repository.seedr-1.0.0.zip))
+2. In Kodi, go to Add-ons > Install from zip file
+3. Select the downloaded zip file
+4. The repository will be installed
+
+### Addon Installation
+
+Once the repository is installed:
+
+1. Go to Add-ons > Install from repository
+2. Select the "Seedr Repository"
+3. Navigate to the addon you want to install
+4. Click "Install"
+
+## Building the Repository
+
+To build/update the repository:
+
+1. Make changes to the addons
+2. Update version numbers in the respective addon.xml files
+3. Run the `update_repo.py` script to update addons.xml and MD5 files
+4. Commit and push changes to GitHub
+
+## License
+
+This project is licensed under the GPL-3.0 License - see the LICENSE file for details.
