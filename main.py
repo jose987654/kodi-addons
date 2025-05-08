@@ -501,164 +501,129 @@ def handle_playback(mode, args, settings, addon_handle):
                     if url:
                         log(f"Playing audio URL: {url}", xbmc.LOGINFO)
                         
-                        # Get folder data to find other audio files for playlist
-                        folder_id = data.get('folder_id')
+                        # Create a ListItem for this audio file
+                        li = xbmcgui.ListItem(path=url)
+                        li.setInfo('music', {
+                            'title': data.get('name', 'Unknown Audio'),
+                            'mediatype': 'song'
+                        })
                         
-                        # Create a playlist for audio files
-                        playlist = xbmc.PlayList(xbmc.PLAYLIST_MUSIC)
-                        playlist.clear()  # Clear any existing playlist
-                        
-                        # Add the current file to the playlist first
-                        current_li = xbmcgui.ListItem(path=url)
-                        current_li.setInfo('music', {'title': data.get('name', 'Unknown Audio')})
-                        current_li.setProperty('IsPlayable', 'true')
-                        current_li.setMimeType('audio/mpeg')  # Default audio MIME type
-                        
-                        # Check file extension and set appropriate MIME type
+                        # Set MIME type based on file extension
                         if file_ext.endswith('.mp3'):
-                            current_li.setMimeType('audio/mpeg')
+                            li.setMimeType('audio/mpeg')
                         elif file_ext.endswith('.m4a') or file_ext.endswith('.aac'):
-                            current_li.setMimeType('audio/aac')
+                            li.setMimeType('audio/aac')
                         elif file_ext.endswith('.flac'):
-                            current_li.setMimeType('audio/flac')
+                            li.setMimeType('audio/flac')
                         elif file_ext.endswith('.wav'):
-                            current_li.setMimeType('audio/wav')
+                            li.setMimeType('audio/wav')
                         elif file_ext.endswith('.ogg'):
-                            current_li.setMimeType('audio/ogg')
-                            
-                        current_li.setArt({
+                            li.setMimeType('audio/ogg')
+                        else:
+                            li.setMimeType('audio/mpeg')  # Default MIME type
+                        
+                        # Set art
+                        li.setArt({
                             'icon': 'DefaultAudio.png',
                             'thumb': 'DefaultAudio.png'
                         })
                         
-                        # First resolve the URL for the current file
-                        xbmcplugin.setResolvedUrl(addon_handle, True, current_li)
+                        # Important: Mark as playable and resolve URL
+                        li.setProperty('IsPlayable', 'true')
+                        xbmcplugin.setResolvedUrl(addon_handle, True, li)
                         
-                        # Now handle playlist
-                        playlist.add(url, current_li)
-                        
-                        # If we have a folder ID, get all audio files in the folder
-                        if folder_id:
-                            log(f"Getting all audio files from folder ID: {folder_id}", xbmc.LOGINFO)
-                            folder_data = call_api(f'/api/v0.1/p/fs/folder/{folder_id}/contents', settings['access_token'])
+                        # If we're handling a single audio file directly (not from a playlist)
+                        # we can optionally build a playlist of other audio files in the same folder
+                        if not args.get('from_playlist'):
+                            # Get folder data to find other audio files for playlist
+                            folder_id = data.get('folder_id')
                             
-                            if folder_data and 'files' in folder_data:
-                                # Sort the files by name
-                                folder_files = sorted(folder_data['files'], key=lambda x: x.get('name', ''))
-                                
-                                # Find the index of the current file to adjust playlist order
-                                current_index = -1
-                                for i, file_item in enumerate(folder_files):
-                                    if file_item.get('id') == int(file_id):
-                                        current_index = i
-                                        break
-                                
-                                # Process all audio files in the folder
-                                added_files = 0
-                                
-                                # First add files after the current one
-                                for i in range(current_index + 1, len(folder_files)):
-                                    file_item = folder_files[i]
-                                    if file_item.get('is_audio', False):
-                                        # For each audio file, get the stream URL and add to playlist
-                                        next_file_id = file_item.get('id')
-                                        next_name = file_item.get('name', 'Unknown Audio')
+                            # Build a playlist only if we have a folder ID
+                            if folder_id:
+                                try:
+                                    # Create a playlist for audio files
+                                    playlist = xbmc.PlayList(xbmc.PLAYLIST_MUSIC)
+                                    playlist.clear()  # Clear any existing playlist
+                                    
+                                    # Add the current file to the playlist first
+                                    current_li = xbmcgui.ListItem(data.get('name', 'Unknown Audio'), path=url)
+                                    current_li.setInfo('music', {'title': data.get('name', 'Unknown Audio')})
+                                    current_li.setProperty('IsPlayable', 'true')
+                                    
+                                    # Set the appropriate MIME type
+                                    if file_ext.endswith('.mp3'):
+                                        current_li.setMimeType('audio/mpeg')
+                                    elif file_ext.endswith('.m4a') or file_ext.endswith('.aac'):
+                                        current_li.setMimeType('audio/aac')
+                                    elif file_ext.endswith('.flac'):
+                                        current_li.setMimeType('audio/flac')
+                                    elif file_ext.endswith('.wav'):
+                                        current_li.setMimeType('audio/wav')
+                                    elif file_ext.endswith('.ogg'):
+                                        current_li.setMimeType('audio/ogg')
+                                    else:
+                                        current_li.setMimeType('audio/mpeg')  # Default
+                                    
+                                    current_li.setArt({
+                                        'icon': 'DefaultAudio.png',
+                                        'thumb': 'DefaultAudio.png'
+                                    })
+                                    
+                                    # Add the current file as direct URL
+                                    playlist.add(url, current_li)
+                                    
+                                    # Get all files in the folder
+                                    log(f"Getting audio files from folder ID: {folder_id}", xbmc.LOGINFO)
+                                    folder_data = call_api(f'/api/v0.1/p/fs/folder/{folder_id}/contents', settings['access_token'])
+                                    
+                                    if folder_data and 'files' in folder_data:
+                                        # Sort the files by name
+                                        folder_files = sorted(folder_data['files'], key=lambda x: x.get('name', ''))
                                         
-                                        log(f"Adding next audio file to playlist: {next_name}", xbmc.LOGINFO)
+                                        # Find the index of the current file
+                                        current_index = -1
+                                        for i, file_item in enumerate(folder_files):
+                                            if file_item.get('id') == int(file_id):
+                                                current_index = i
+                                                break
                                         
-                                        # Try to get direct download URL for this file
-                                        next_audio_data = call_api(f'/api/v0.1/p/fs/file/{next_file_id}/download', settings['access_token'])
-                                        
-                                        # Fallback to media API if download fails
-                                        if not next_audio_data or not next_audio_data.get('url'):
-                                            next_audio_data = call_api(f'/api/v0.1/p/media/fs/item/{next_file_id}/video/url', settings['access_token'])
-                                        
-                                        if next_audio_data and 'url' in next_audio_data:
-                                            next_url = next_audio_data['url']
-                                            next_li = xbmcgui.ListItem(next_name)
-                                            next_li.setInfo('music', {'title': next_name})
-                                            next_li.setProperty('IsPlayable', 'true')
+                                        if current_index >= 0:
+                                            # Add files after the current one
+                                            for i in range(current_index + 1, len(folder_files)):
+                                                file_item = folder_files[i]
+                                                if file_item.get('is_audio', False):
+                                                    next_file_id = file_item.get('id')
+                                                    next_name = file_item.get('name', 'Unknown Audio')
+                                                    
+                                                    # Add the plugin URL to playlist
+                                                    plugin_url = f"plugin://{addon.getAddonInfo('id')}/?mode=file&file_id={next_file_id}&from_playlist=true"
+                                                    li = xbmcgui.ListItem(next_name)
+                                                    li.setInfo('music', {'title': next_name})
+                                                    li.setProperty('IsPlayable', 'true')
+                                                    playlist.add(plugin_url, li)
                                             
-                                            # Set the appropriate MIME type based on extension
-                                            next_file_ext = next_name.lower()
-                                            if next_file_ext.endswith('.mp3'):
-                                                next_li.setMimeType('audio/mpeg')
-                                            elif next_file_ext.endswith('.m4a') or next_file_ext.endswith('.aac'):
-                                                next_li.setMimeType('audio/aac')
-                                            elif next_file_ext.endswith('.flac'):
-                                                next_li.setMimeType('audio/flac')
-                                            elif next_file_ext.endswith('.wav'):
-                                                next_li.setMimeType('audio/wav')
-                                            elif next_file_ext.endswith('.ogg'):
-                                                next_li.setMimeType('audio/ogg')
-                                            else:
-                                                next_li.setMimeType('audio/mpeg')  # Default
-                                                
-                                            next_li.setArt({
-                                                'icon': 'DefaultAudio.png',
-                                                'thumb': 'DefaultAudio.png'
-                                            })
+                                            # Add files before the current one
+                                            for i in range(0, current_index):
+                                                file_item = folder_files[i]
+                                                if file_item.get('is_audio', False):
+                                                    next_file_id = file_item.get('id')
+                                                    next_name = file_item.get('name', 'Unknown Audio')
+                                                    
+                                                    # Add the plugin URL to playlist
+                                                    plugin_url = f"plugin://{addon.getAddonInfo('id')}/?mode=file&file_id={next_file_id}&from_playlist=true"
+                                                    li = xbmcgui.ListItem(next_name)
+                                                    li.setInfo('music', {'title': next_name})
+                                                    li.setProperty('IsPlayable', 'true')
+                                                    playlist.add(plugin_url, li)
                                             
-                                            # Create playlist URL with plugin format to ensure playability
-                                            playlist_url = f"plugin://{addon.getAddonInfo('id')}/?mode=file&file_id={next_file_id}"
-                                            playlist.add(playlist_url, next_li)
-                                            
-                                            added_files += 1
-                                
-                                # Then add files before the current one (to loop back)
-                                for i in range(0, current_index):
-                                    file_item = folder_files[i]
-                                    if file_item.get('is_audio', False):
-                                        # For each audio file, get the stream URL and add to playlist
-                                        next_file_id = file_item.get('id')
-                                        next_name = file_item.get('name', 'Unknown Audio')
-                                        
-                                        log(f"Adding previous audio file to playlist: {next_name}", xbmc.LOGINFO)
-                                        
-                                        # Try to get direct download URL for this file
-                                        next_audio_data = call_api(f'/api/v0.1/p/fs/file/{next_file_id}/download', settings['access_token'])
-                                        
-                                        # Fallback to media API if download fails
-                                        if not next_audio_data or not next_audio_data.get('url'):
-                                            next_audio_data = call_api(f'/api/v0.1/p/media/fs/item/{next_file_id}/video/url', settings['access_token'])
-                                            
-                                        if next_audio_data and 'url' in next_audio_data:
-                                            next_url = next_audio_data['url']
-                                            next_li = xbmcgui.ListItem(next_name)
-                                            next_li.setInfo('music', {'title': next_name})
-                                            next_li.setProperty('IsPlayable', 'true')
-                                            
-                                            # Set the appropriate MIME type based on extension
-                                            next_file_ext = next_name.lower()
-                                            if next_file_ext.endswith('.mp3'):
-                                                next_li.setMimeType('audio/mpeg')
-                                            elif next_file_ext.endswith('.m4a') or next_file_ext.endswith('.aac'):
-                                                next_li.setMimeType('audio/aac')
-                                            elif next_file_ext.endswith('.flac'):
-                                                next_li.setMimeType('audio/flac')
-                                            elif next_file_ext.endswith('.wav'):
-                                                next_li.setMimeType('audio/wav')
-                                            elif next_file_ext.endswith('.ogg'):
-                                                next_li.setMimeType('audio/ogg')
-                                            else:
-                                                next_li.setMimeType('audio/mpeg')  # Default
-                                                
-                                            next_li.setArt({
-                                                'icon': 'DefaultAudio.png',
-                                                'thumb': 'DefaultAudio.png'
-                                            })
-                                            
-                                            # Create playlist URL with plugin format to ensure playability
-                                            playlist_url = f"plugin://{addon.getAddonInfo('id')}/?mode=file&file_id={next_file_id}"
-                                            playlist.add(playlist_url, next_li)
-                                            
-                                            added_files += 1
-                                
-                                log(f"Added {added_files} audio files to playlist", xbmc.LOGINFO)
+                                    # Start playing the playlist
+                                    log("Starting audio playlist playback", xbmc.LOGINFO)
+                                    xbmc.Player().play(playlist)
+                                except Exception as e:
+                                    log(f"Error building playlist: {str(e)}", xbmc.LOGERROR)
+                                    # Continue with single file playback if playlist fails
+                                    pass
                         
-                        # Start playing the playlist from the first item (current file)
-                        log("Starting playlist playback", xbmc.LOGINFO)
-                        xbmc.Player().play(playlist)
                         return
                     else:
                         li = xbmcgui.ListItem()
