@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <addons>
-    <addon id="plugin.video.seedr" name="Seedr" version="1.0.5" provider-name="Seedr">
+    <addon id="plugin.video.seedr" name="Seedr" version="1.0.6" provider-name="Seedr">
         <requires>
             <import addon="xbmc.python" version="3.0.0" />
             <import addon="script.module.requests" version="2.22.0" />

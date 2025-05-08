@@ -483,7 +483,7 @@ def handle_playback(mode, args, settings, addon_handle):
                     log("Failed to get video URL", xbmc.LOGERROR)
                     show_auto_close_notification(addonname, "Failed to get video URL. Please try again.")
             elif data.get('is_audio', False):
-                # Get the audio streaming URL
+                # Get the audio streaming URL - direct media API call
                 log("Fetching audio streaming URL", xbmc.LOGINFO)
                 audio_data = call_api(f'/api/v0.1/p/media/fs/item/{file_id}/video/url', settings['access_token'])
                 log(f"Audio URL response: {audio_data}", xbmc.LOGINFO)
@@ -492,9 +492,23 @@ def handle_playback(mode, args, settings, addon_handle):
                     url = audio_data.get('url')
                     if url:
                         log(f"Playing audio URL: {url}", xbmc.LOGINFO)
-                        li = xbmcgui.ListItem(path=url)
-                        li.setInfo('audio', {'title': data.get('name', 'Unknown Audio')})
-                        xbmcplugin.setResolvedUrl(addon_handle, True, li)
+                        
+                        # Create ListItem for simple audio playback with InfoTagMusic
+                        file_name = data.get('name', 'Unknown Audio')
+                        current_li = xbmcgui.ListItem(path=url)
+                        
+                        # Use the InfoTagMusic approach to avoid deprecation warning
+                        info_tag = current_li.getMusicInfoTag()
+                        info_tag.setTitle(file_name)
+                        info_tag.setMediaType('song')
+                        
+                        current_li.setArt({
+                            'icon': 'DefaultAudio.png',
+                            'thumb': 'DefaultAudio.png'
+                        })
+                        
+                        # Set resolved URL and play directly
+                        xbmcplugin.setResolvedUrl(addon_handle, True, current_li)
                         return
                     else:
                         li = xbmcgui.ListItem()
