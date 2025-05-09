@@ -81,10 +81,27 @@ Stream videos, music, and images from your Seedr cloud storage directly to Kodi.
 
 ### Repository Installation
 
-1. Download the repository zip file ([repository.seedr-1.0.1.zip](repository.seedr-1.0.1.zip))
+## Method 1: Direct Download and Install
+
+1. Download the repository zip file ([repository.seedr-1.0.1.zip](../repository.seedr-1.0.1.zip))
 2. In Kodi, go to Add-ons > Install from zip file
 3. Select the downloaded zip file
-4. The repository will be installed
+4. The repository will be installed, and you can then install the Seedr addon from the repository
+
+## Method 2: Install via File Source
+
+1. In Kodi, go to Settings > File Manager
+2. Select "Add source"
+3. Enter `https://jose987654.github.io/kodi-addons/` as the path
+4. Name it "Seedr Repository" (or any name you prefer)
+5. Go to Add-ons > Install from zip file
+6. Select "Seedr Repository" (or the name you chose)
+7. Select repository.seedr-1.0.1.zip
+8. Wait for the "Add-on installed" notification
+9. Go to Add-ons > Install from repository
+10. Select "Seedr Repository"
+11. Navigate to Video Add-ons
+12. Select and install the Seedr addon
 
 ### Addon Installation
 
