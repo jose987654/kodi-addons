@@ -12,8 +12,7 @@ This repository contains Kodi addons for enhancing your entertainment experience
 <pre>
 <img src="icons/folder.gif" alt="[DIR]"> <a href="repository.seedr/">repository.seedr/</a>
 <img src="icons/folder.gif" alt="[DIR]"> <a href="plugin.video.seedr/">plugin.video.seedr/</a>
-<img src="icons/compressed.gif" alt="[ZIP]"> <a href="repository.seedr-1.0.1.zip">repository.seedr-1.0.1.zip</a>
-<img src="icons/compressed.gif" alt="[ZIP]"> <a href="plugin.video.seedr-1.0.11.zip">plugin.video.seedr-1.0.11.zip</a>
+
 </pre>
 
 ## Downloads
