@@ -83,7 +83,7 @@ Once the repository is installed:
 ## Quick Downloads
 
 👉 **[DOWNLOAD REPOSITORY.SEEDR-1.0.1.ZIP](/repository.seedr-1.0.1.zip)** - Install this first!  
-👉 **[DOWNLOAD PLUGIN.VIDEO.SEEDR-1.0.11.ZIP](/plugin.video.seedr-1.0.11.zip)** - Seedr addon
+👉 **[DOWNLOAD PLUGIN.VIDEO.SEEDR-1.1.0.ZIP](/plugin.video.seedr-1.1.0.zip)** - Seedr addon
 
 ## Repository Navigation
 
@@ -101,7 +101,7 @@ Once the repository is installed:
 
 ### Addon
 
-- [plugin.video.seedr-1.0.11.zip](/plugin.video.seedr-1.0.11.zip) - Seedr Addon ZIP file
+- [plugin.video.seedr-1.1.0.zip](/plugin.video.seedr-1.1.0.zip) - Seedr Addon ZIP file
 
 ## Usage
 
