@@ -8,8 +8,8 @@
         </dir>
     </extension>
     <extension point="xbmc.addon.metadata">
-        <summary lang="en_GB">Seedr Repository&#10;Download Torrents to the seedr cloud&#10;-- Instant access across all devices through Kodi, your phone, your PC&#10;:-) www.seedr.cc Account required</summary>            <disclaimer>This plugin and all it's content, unless otherwise specified, is property of Seedr.cc</disclaimer>
-        <description>Repository for Seedr Kodi Addon</description>
+        <summary lang="en_GB">Seedr Repository&#10;Download Torrents to the seedr cloud&#10;Instantly access across all devices through Kodi, your phone, your PC&#10;:-) www.seedr.cc Account required</summary>            
+        <disclaimer>This plugin and all it's content, unless otherwise specified, is property of Seedr.cc</disclaimer>
         <description lang="en_GB">This repository contains the Seedr Torrent Cloud add-on for Kodi, allowing you to stream torrents from your Seedr.cc cloud storage.</description>
         <disclaimer>This plugin and all it's content, unless otherwise specified, is property of Seedr.cc</disclaimer>
         <license>GPL-3.0</license>

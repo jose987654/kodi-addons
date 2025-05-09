@@ -12,13 +12,8 @@
         <extension point="xbmc.addon.metadata">
             <summary lang="en_GB">Seedr - Stream your cloud media</summary>
             <description lang="en_GB">Stream videos, music, and images from your Seedr cloud storage directly to Kodi.
-    
     Features:
-    - Stream media files directly without downloading
-    - Automatic playlist support for audio files
-    - Easy navigation through your Seedr folders
-    - Access your cloud content from anywhere
-    
+    - Stream media files directly without downloading, Automatic playlist support for audio files. Easy navigation through your Seedr folders. Access your cloud content from anywhere
     Requires a Seedr.cc account. Visit www.seedr.cc to sign up.</description>
             <platform>all</platform>
             <license>GPL-3.0</license>
@@ -40,9 +35,9 @@
         <extension point="xbmc.addon.metadata">
             <summary lang="en_GB">Seedr Repository
     Download Torrents to the seedr cloud
-    -- Instant access across all devices through Kodi, your phone, your PC
-    :-) www.seedr.cc Account required</summary>            <disclaimer>This plugin and all it's content, unless otherwise specified, is property of Seedr.cc</disclaimer>
-            <description>Repository for Seedr Kodi Addon</description>
+    Instantly access across all devices through Kodi, your phone, your PC
+    :-) www.seedr.cc Account required</summary>            
+            <disclaimer>This plugin and all it's content, unless otherwise specified, is property of Seedr.cc</disclaimer>
             <description lang="en_GB">This repository contains the Seedr Torrent Cloud add-on for Kodi, allowing you to stream torrents from your Seedr.cc cloud storage.</description>
             <disclaimer>This plugin and all it's content, unless otherwise specified, is property of Seedr.cc</disclaimer>
             <license>GPL-3.0</license>
