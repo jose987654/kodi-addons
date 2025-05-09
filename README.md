@@ -100,12 +100,9 @@ Once the repository is installed:
 ### Repository
 
 - [repository.seedr-1.0.1.zip](repository.seedr-1.0.1.zip) - Repository ZIP file
-- [repository.seedr-1.0.1.zip.md5](repository.seedr-1.0.1.zip.md5) - MD5 Checksum: `5E2D14203DF0B04850EBDB8064BF6813`
 
 ### Addon
-
 - [plugin.video.seedr-1.0.11.zip](plugin.video.seedr-1.0.11.zip) - Seedr Addon ZIP file
-- [plugin.video.seedr-1.0.11.zip.md5](plugin.video.seedr-1.0.11.zip.md5) - MD5 Checksum: `8F5C5A405ED80B7825AA9D59C3028FC3`
 
 ## Usage
 
