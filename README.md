@@ -22,31 +22,6 @@ Kodi is particularly popular among home theater enthusiasts and cord-cutters as 
 - Seedr.cc account
 - Internet connection
 
-## Quick Downloads
-
-👉 **[DOWNLOAD REPOSITORY.SEEDR-1.0.1.ZIP](repository.seedr-1.0.1.zip)** - Install this first!  
-👉 **[DOWNLOAD PLUGIN.VIDEO.SEEDR-1.0.11.ZIP](plugin.video.seedr-1.0.11.zip)** - Seedr addon
-
-## Repository Navigation
-
-<pre>
-<img src="icons/folder.gif" alt="[DIR]"> <a href="repository.seedr/">repository.seedr/</a>
-<img src="icons/folder.gif" alt="[DIR]"> <a href="plugin.video.seedr/">plugin.video.seedr/</a>
-
-</pre>
-
-## Downloads
-
-### Repository
-
-- [repository.seedr-1.0.1.zip](repository.seedr-1.0.1.zip) - Repository ZIP file
-- [repository.seedr-1.0.1.zip.md5](repository.seedr-1.0.1.zip.md5) - MD5 Checksum: `5E2D14203DF0B04850EBDB8064BF6813`
-
-### Addon
-
-- [plugin.video.seedr-1.0.11.zip](plugin.video.seedr-1.0.11.zip) - Seedr Addon ZIP file
-- [plugin.video.seedr-1.0.11.zip.md5](plugin.video.seedr-1.0.11.zip.md5) - MD5 Checksum: `8F5C5A405ED80B7825AA9D59C3028FC3`
-
 ## Available Addons
 
 ### Seedr Addon
@@ -71,13 +46,6 @@ Stream videos, music, and images from your Seedr cloud storage directly to Kodi.
 4. Enter the verification code
 5. The addon will automatically complete the authentication process
 6. Authorize the application to access the files.
-
-## Usage
-
-- Navigate through your Seedr.cc folders using the Kodi interface
-- Video files will be automatically playable
-- Audio files will be available for streaming
-- Use the context menu to refresh the current view or go back to parent directory
 
 ### Repository Installation
 
@@ -111,6 +79,40 @@ Once the repository is installed:
 2. Select the "Seedr Repository"
 3. Navigate to the addon you want to install
 4. Click "Install"
+
+
+
+## Quick Downloads
+
+👉 **[DOWNLOAD REPOSITORY.SEEDR-1.0.1.ZIP](repository.seedr-1.0.1.zip)** - Install this first!  
+👉 **[DOWNLOAD PLUGIN.VIDEO.SEEDR-1.0.11.ZIP](plugin.video.seedr-1.0.11.zip)** - Seedr addon
+
+## Repository Navigation
+
+<pre>
+<img src="icons/folder.gif" alt="[DIR]"> <a href="repository.seedr/">repository.seedr/</a>
+<img src="icons/folder.gif" alt="[DIR]"> <a href="plugin.video.seedr/">plugin.video.seedr/</a>
+
+</pre>
+
+## Downloads
+
+### Repository
+
+- [repository.seedr-1.0.1.zip](repository.seedr-1.0.1.zip) - Repository ZIP file
+- [repository.seedr-1.0.1.zip.md5](repository.seedr-1.0.1.zip.md5) - MD5 Checksum: `5E2D14203DF0B04850EBDB8064BF6813`
+
+### Addon
+
+- [plugin.video.seedr-1.0.11.zip](plugin.video.seedr-1.0.11.zip) - Seedr Addon ZIP file
+- [plugin.video.seedr-1.0.11.zip.md5](plugin.video.seedr-1.0.11.zip.md5) - MD5 Checksum: `8F5C5A405ED80B7825AA9D59C3028FC3`
+
+## Usage
+
+- Navigate through your Seedr.cc folders using the Kodi interface
+- Video files will be automatically playable
+- Audio files will be available for streaming
+- Use the context menu to refresh the current view or go back to parent directory
 
 ## Technical Details
 
@@ -153,26 +155,6 @@ To build/update the repository:
 - Streamlined approach with direct audio playback
 - Removed excess code for better reliability
 
-**What's New in v1.0.4:**
-
-- Simplified audio playback for better reliability
-- Removed playlist functionality for more stable audio playback
-- Retained direct URL playback and InfoTagMusic approach
-
-**What's New in v1.0.3:**
-
-- Enhanced audio playback with improved playlist handling
-- Fixed Kodi API deprecation warnings for audio files
-- Implemented direct URL playback for audio playlists
-- Added fallback to direct download URLs for audio files
-- Updated InfoTagMusic approach for newer Kodi versions
-
-**What's New in v1.0.2:**
-
-- Fixed audio playback issues with direct files
-- Improved audio playlist handling
-- Better handling of audio formats
-- Fixed issue with audio files not playing via plugin URL
 
 ## Support
 
