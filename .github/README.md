@@ -157,4 +157,4 @@ For issues or questions, please check the project's issue tracker or contact the
 
 ## License
 
-This project is licensed under the [GPL-3.0 License](LICENSE).
+This project is licensed under the [GPL-3.0 License](/LICENSE).
