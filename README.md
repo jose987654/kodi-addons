@@ -83,7 +83,7 @@ Once the repository is installed:
 ## Quick Downloads
 
 👉 **[DOWNLOAD REPOSITORY.SEEDR-1.0.1.ZIP](repository.seedr-1.0.1.zip)** - Install this first!  
-👉 **[DOWNLOAD PLUGIN.VIDEO.SEEDR-1.0.11.ZIP](plugin.video.seedr-1.0.11.zip)** - Seedr addon
+👉 **[DOWNLOAD PLUGIN.VIDEO.SEEDR-1.1.0.ZIP](plugin.video.seedr-1.1.0.zip)** - Seedr addon
 
 ## Repository Navigation
 
@@ -101,7 +101,7 @@ Once the repository is installed:
 
 ### Addon
 
-- [plugin.video.seedr-1.0.11.zip](plugin.video.seedr-1.0.11.zip) - Seedr Addon ZIP file
+- [plugin.video.seedr-1.1.0.zip](plugin.video.seedr-1.1.0.zip) - Seedr Addon ZIP file
 
 ## Usage
 
@@ -134,10 +134,12 @@ To build/update the repository:
 3. Run the `update_repo.py` script to update addons.xml and MD5 files
 4. Commit and push changes to GitHub
 
-**What's New in v1.0.11:**
+**What's New in v1.1.0:**
 
-- Updated icon images
-- Improved user interface
+- Updated to standard semantic versioning
+- Updated fanart images with new Seedr design
+- Improved audio playlist support
+- Enhanced user interface
 
 **What's New in v1.0.6:**
 
