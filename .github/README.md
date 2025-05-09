@@ -88,8 +88,8 @@ Once the repository is installed:
 ## Repository Navigation
 
 <pre>
-<img src="icons/folder.gif" alt="[DIR]"> <a href="repository.seedr/">repository.seedr/</a>
-<img src="icons/folder.gif" alt="[DIR]"> <a href="plugin.video.seedr/">plugin.video.seedr/</a>
+<img src="icons/folder.gif" alt="[DIR]"> <a href="/repository.seedr/">repository.seedr/</a>
+<img src="icons/folder.gif" alt="[DIR]"> <a href="/plugin.video.seedr/">plugin.video.seedr/</a>
 
 </pre>
 
@@ -97,11 +97,11 @@ Once the repository is installed:
 
 ### Repository
 
-- [repository.seedr-1.0.1.zip](repository.seedr-1.0.1.zip) - Repository ZIP file
+- [repository.seedr-1.0.1.zip](/repository.seedr-1.0.1.zip) - Repository ZIP file
 
 ### Addon
 
-- [plugin.video.seedr-1.0.11.zip](plugin.video.seedr-1.0.11.zip) - Seedr Addon ZIP file
+- [plugin.video.seedr-1.0.11.zip](/plugin.video.seedr-1.0.11.zip) - Seedr Addon ZIP file
 
 ## Usage
 
