@@ -507,6 +507,63 @@ def handle_playback(mode, args, settings, addon_handle):
                             'thumb': 'DefaultAudio.png'
                         })
                         
+                        # Get folder contents to create playlist
+                        folder_id = data.get('folder_id')
+                        if folder_id:
+                            log(f"Getting folder contents for playlist creation, folder ID: {folder_id}", xbmc.LOGINFO)
+                            folder_data = call_api(f'/api/v0.1/p/fs/folder/{folder_id}/contents', settings['access_token'])
+                            
+                            if folder_data and 'files' in folder_data:
+                                # Create a new playlist for this folder
+                                playlist = xbmc.PlayList(xbmc.PLAYLIST_MUSIC)
+                                playlist.clear()  # Clear any existing playlist
+                                
+                                # Add all audio files to the playlist
+                                audio_files = []
+                                for file_item in folder_data['files']:
+                                    if file_item.get('is_audio', False):
+                                        audio_files.append(file_item)
+                                
+                                # Sort audio files by name for consistent playlist order
+                                audio_files.sort(key=lambda x: x.get('name', '').lower())
+                                
+                                # Find the index of the current file in the list
+                                current_file_index = -1
+                                for idx, file_item in enumerate(audio_files):
+                                    if file_item.get('id') == int(file_id):
+                                        current_file_index = idx
+                                        break
+                                
+                                if current_file_index >= 0:
+                                    # Put the current file first in the playlist
+                                    playlist.add(url, current_li)
+                                    
+                                    # Add the remaining files in order, after the current one
+                                    remaining_files = audio_files[current_file_index+1:] + audio_files[:current_file_index]
+                                    
+                                    for file_item in remaining_files:
+                                        f_id = file_item.get('id')
+                                        f_name = file_item.get('name', 'Unknown Audio')
+                                        
+                                        # Use playlist_item_url to create a URL for playlist items
+                                        playlist_item_url = build_url({'mode': 'file', 'file_id': str(f_id)})
+                                        
+                                        # Create list item for this audio file
+                                        li = xbmcgui.ListItem(f_name, path=playlist_item_url)
+                                        music_tag = li.getMusicInfoTag()
+                                        music_tag.setTitle(f_name)
+                                        music_tag.setMediaType('song')
+                                        
+                                        li.setArt({
+                                            'icon': 'DefaultAudio.png',
+                                            'thumb': 'DefaultAudio.png'
+                                        })
+                                        
+                                        # Add to playlist
+                                        playlist.add(playlist_item_url, li)
+                                    
+                                    log(f"Created music playlist with {len(audio_files)} items", xbmc.LOGINFO)
+                        
                         # Set resolved URL and play directly
                         xbmcplugin.setResolvedUrl(addon_handle, True, current_li)
                         return
@@ -526,82 +583,205 @@ def handle_playback(mode, args, settings, addon_handle):
                 log(f"File ID: {file_id}", xbmc.LOGINFO)
                 log(f"File name: {data.get('name', 'Unknown')}", xbmc.LOGINFO)
                 
-                # We need to get the original file listing to access the presentation URLs
-                image_url = None
+                # Check if this is a PDF file
+                file_name = data.get('name', '').lower()
+                is_pdf = file_name.endswith('.pdf')
                 
-                # First search for the file in the folder contents or root
-                folder_data = None
-                if 'folder_id' in data:
-                    folder_id = data.get('folder_id')
-                    log(f"Searching for image in folder ID: {folder_id}", xbmc.LOGINFO)
-                    folder_data = call_api(f'/api/v0.1/p/fs/folder/{folder_id}/contents', settings['access_token'])
+                if is_pdf:
+                    log(f"File is a PDF document: {file_name}", xbmc.LOGINFO)
+                    # For PDFs, we'll try to display the presentation image
+                    # The presentation image is a thumbnail preview of the PDF
+                    
+                    # We need to get the original file listing to access the presentation URLs
+                    image_url = None
+                    
+                    # First search for the file in the folder contents or root
+                    folder_data = None
+                    if 'folder_id' in data:
+                        folder_id = data.get('folder_id')
+                        log(f"Searching for PDF image in folder ID: {folder_id}", xbmc.LOGINFO)
+                        folder_data = call_api(f'/api/v0.1/p/fs/folder/{folder_id}/contents', settings['access_token'])
+                    else:
+                        log("Searching for PDF image in root folder", xbmc.LOGINFO)
+                        folder_data = call_api('/api/v0.1/p/fs/root/contents', settings['access_token'])
+                    
+                    # Find the file in the folder data
+                    if folder_data and 'files' in folder_data:
+                        log(f"Found {len(folder_data['files'])} files in folder", xbmc.LOGINFO)
+                        for file_item in folder_data['files']:
+                            if file_item.get('id') == int(file_id):
+                                log(f"Found matching file in folder: {file_item.get('name')}", xbmc.LOGINFO)
+                                log(f"File data: {file_item}", xbmc.LOGINFO)
+                                
+                                # Check for presentation URLs
+                                if 'presentation_urls' in file_item and isinstance(file_item['presentation_urls'], dict):
+                                    log("Found presentation_urls in folder data", xbmc.LOGINFO)
+                                    if 'image' in file_item['presentation_urls'] and isinstance(file_item['presentation_urls']['image'], dict):
+                                        image_urls = file_item['presentation_urls']['image']
+                                        log(f"Found image URLs in folder data: {image_urls}", xbmc.LOGINFO)
+                                        
+                                        # Try to get the highest resolution
+                                        if '720' in image_urls:
+                                            image_url = image_urls['720']
+                                            log(f"Selected 720p image: {image_url}", xbmc.LOGINFO)
+                                        elif '220' in image_urls:
+                                            image_url = image_urls['220']
+                                            log(f"Selected 220p image: {image_url}", xbmc.LOGINFO)
+                                        elif '64' in image_urls:
+                                            image_url = image_urls['64']
+                                            log(f"Selected 64p image: {image_url}", xbmc.LOGINFO)
+                                        elif '48' in image_urls:
+                                            image_url = image_urls['48']
+                                            log(f"Selected 48p image: {image_url}", xbmc.LOGINFO)
+                                
+                                # Also check for thumb
+                                if not image_url and 'thumb' in file_item:
+                                    image_url = file_item['thumb']
+                                    log(f"Using thumb URL from folder data: {image_url}", xbmc.LOGINFO)
+                    
+                    # Fallback to regular paths
+                    if not image_url:
+                        log("No image URL found in folder data, checking file data directly", xbmc.LOGINFO)
+                        
+                        # Check for presentation URLs in the file data
+                        if 'presentation_urls' in data and isinstance(data['presentation_urls'], dict):
+                            log("Found presentation_urls in file data", xbmc.LOGINFO)
+                            if 'image' in data['presentation_urls'] and isinstance(data['presentation_urls']['image'], dict):
+                                image_urls = data['presentation_urls']['image']
+                                log(f"Found image URLs in file data: {image_urls}", xbmc.LOGINFO)
+                                
+                                # Try to get the highest resolution
+                                if '720' in image_urls:
+                                    image_url = image_urls['720']
+                                    log(f"Selected 720p image from file data: {image_url}", xbmc.LOGINFO)
+                                elif '220' in image_urls:
+                                    image_url = image_urls['220']
+                                    log(f"Selected 220p image from file data: {image_url}", xbmc.LOGINFO)
+                                elif '64' in image_urls:
+                                    image_url = image_urls['64']
+                                    log(f"Selected 64p image from file data: {image_url}", xbmc.LOGINFO)
+                                elif '48' in image_urls:
+                                    image_url = image_urls['48']
+                                    log(f"Selected 48p image from file data: {image_url}", xbmc.LOGINFO)
+                        
+                        # Fallback to thumb in file data
+                        if not image_url and 'thumb' in data:
+                            image_url = data['thumb']
+                            log(f"Using thumb URL from file data: {image_url}", xbmc.LOGINFO)
+                    
+                    if image_url:
+                        log(f"Final PDF preview image URL for ShowPicture: {image_url}", xbmc.LOGINFO)
+                        
+                        # Create a proper ListItem to avoid "unplayable item" error
+                        li = xbmcgui.ListItem(path=image_url)
+                        li.setInfo('video', {'title': data.get('name', 'Unknown PDF')})
+                        li.setArt({
+                            'icon': image_url,
+                            'thumb': image_url,
+                            'poster': image_url,
+                            'fanart': image_url
+                        })
+                        
+                        # Set MIME type for the image
+                        li.setMimeType('image/jpeg')  # Default for preview images
+                        
+                        # First set the resolved URL with TRUE to avoid error messages
+                        log("Setting resolved URL with proper ListItem for PDF preview", xbmc.LOGINFO)
+                        xbmcplugin.setResolvedUrl(addon_handle, True, li)
+                        
+                        # Short delay to allow Kodi to process
+                        xbmc.sleep(200)
+                        
+                        # Direct command to show the picture
+                        cmd = f'ShowPicture({image_url})'
+                        log(f"Executing ShowPicture command for PDF preview: {cmd}", xbmc.LOGINFO)
+                        xbmc.executebuiltin(cmd)
+                        log("ShowPicture command executed for PDF preview", xbmc.LOGINFO)
+                        return
+                    else:
+                        # If we can't get a preview image, show a notification
+                        log("No preview image found for PDF file", xbmc.LOGERROR)
+                        li = xbmcgui.ListItem()
+                        xbmcplugin.setResolvedUrl(addon_handle, False, li)
+                        show_auto_close_notification(addonname, "Cannot display PDF preview. No preview image available.")
+                        return
                 else:
-                    log("Searching for image in root folder", xbmc.LOGINFO)
-                    folder_data = call_api('/api/v0.1/p/fs/root/contents', settings['access_token'])
-                
-                # Find the file in the folder data
-                if folder_data and 'files' in folder_data:
-                    log(f"Found {len(folder_data['files'])} files in folder", xbmc.LOGINFO)
-                    for file_item in folder_data['files']:
-                        if file_item.get('id') == int(file_id):
-                            log(f"Found matching file in folder: {file_item.get('name')}", xbmc.LOGINFO)
-                            log(f"File data: {file_item}", xbmc.LOGINFO)
-                            
-                            # Check for presentation URLs
-                            if 'presentation_urls' in file_item and isinstance(file_item['presentation_urls'], dict):
-                                log("Found presentation_urls in folder data", xbmc.LOGINFO)
-                                if 'image' in file_item['presentation_urls'] and isinstance(file_item['presentation_urls']['image'], dict):
-                                    image_urls = file_item['presentation_urls']['image']
-                                    log(f"Found image URLs in folder data: {image_urls}", xbmc.LOGINFO)
-                                    
-                                    # Try to get the highest resolution
-                                    if '720' in image_urls:
-                                        image_url = image_urls['720']
-                                        log(f"Selected 720p image: {image_url}", xbmc.LOGINFO)
-                                    elif '220' in image_urls:
-                                        image_url = image_urls['220']
-                                        log(f"Selected 220p image: {image_url}", xbmc.LOGINFO)
-                                    elif '64' in image_urls:
-                                        image_url = image_urls['64']
-                                        log(f"Selected 64p image: {image_url}", xbmc.LOGINFO)
-                                    elif '48' in image_urls:
-                                        image_url = image_urls['48']
-                                        log(f"Selected 48p image: {image_url}", xbmc.LOGINFO)
-                            
-                            # Also check for thumb
-                            if not image_url and 'thumb' in file_item:
-                                image_url = file_item['thumb']
-                                log(f"Using thumb URL from folder data: {image_url}", xbmc.LOGINFO)
-                
-                # Fallback to regular paths
-                if not image_url:
-                    log("No image URL found in folder data, checking file data directly", xbmc.LOGINFO)
+                    # We need to get the original file listing to access the presentation URLs
+                    image_url = None
                     
-                    # Check for presentation URLs in the file data
-                    if 'presentation_urls' in data and isinstance(data['presentation_urls'], dict):
-                        log("Found presentation_urls in file data", xbmc.LOGINFO)
-                        if 'image' in data['presentation_urls'] and isinstance(data['presentation_urls']['image'], dict):
-                            image_urls = data['presentation_urls']['image']
-                            log(f"Found image URLs in file data: {image_urls}", xbmc.LOGINFO)
-                            
-                            # Try to get the highest resolution
-                            if '720' in image_urls:
-                                image_url = image_urls['720']
-                                log(f"Selected 720p image from file data: {image_url}", xbmc.LOGINFO)
-                            elif '220' in image_urls:
-                                image_url = image_urls['220']
-                                log(f"Selected 220p image from file data: {image_url}", xbmc.LOGINFO)
-                            elif '64' in image_urls:
-                                image_url = image_urls['64']
-                                log(f"Selected 64p image from file data: {image_url}", xbmc.LOGINFO)
-                            elif '48' in image_urls:
-                                image_url = image_urls['48']
-                                log(f"Selected 48p image from file data: {image_url}", xbmc.LOGINFO)
+                    # First search for the file in the folder contents or root
+                    folder_data = None
+                    if 'folder_id' in data:
+                        folder_id = data.get('folder_id')
+                        log(f"Searching for image in folder ID: {folder_id}", xbmc.LOGINFO)
+                        folder_data = call_api(f'/api/v0.1/p/fs/folder/{folder_id}/contents', settings['access_token'])
+                    else:
+                        log("Searching for image in root folder", xbmc.LOGINFO)
+                        folder_data = call_api('/api/v0.1/p/fs/root/contents', settings['access_token'])
                     
-                    # Fallback to thumb in file data
-                    if not image_url and 'thumb' in data:
-                        image_url = data['thumb']
-                        log(f"Using thumb URL from file data: {image_url}", xbmc.LOGINFO)
+                    # Find the file in the folder data
+                    if folder_data and 'files' in folder_data:
+                        log(f"Found {len(folder_data['files'])} files in folder", xbmc.LOGINFO)
+                        for file_item in folder_data['files']:
+                            if file_item.get('id') == int(file_id):
+                                log(f"Found matching file in folder: {file_item.get('name')}", xbmc.LOGINFO)
+                                log(f"File data: {file_item}", xbmc.LOGINFO)
+                                
+                                # Check for presentation URLs
+                                if 'presentation_urls' in file_item and isinstance(file_item['presentation_urls'], dict):
+                                    log("Found presentation_urls in folder data", xbmc.LOGINFO)
+                                    if 'image' in file_item['presentation_urls'] and isinstance(file_item['presentation_urls']['image'], dict):
+                                        image_urls = file_item['presentation_urls']['image']
+                                        log(f"Found image URLs in folder data: {image_urls}", xbmc.LOGINFO)
+                                        
+                                        # Try to get the highest resolution
+                                        if '720' in image_urls:
+                                            image_url = image_urls['720']
+                                            log(f"Selected 720p image: {image_url}", xbmc.LOGINFO)
+                                        elif '220' in image_urls:
+                                            image_url = image_urls['220']
+                                            log(f"Selected 220p image: {image_url}", xbmc.LOGINFO)
+                                        elif '64' in image_urls:
+                                            image_url = image_urls['64']
+                                            log(f"Selected 64p image: {image_url}", xbmc.LOGINFO)
+                                        elif '48' in image_urls:
+                                            image_url = image_urls['48']
+                                            log(f"Selected 48p image: {image_url}", xbmc.LOGINFO)
+                            
+                                # Also check for thumb
+                                if not image_url and 'thumb' in file_item:
+                                    image_url = file_item['thumb']
+                                    log(f"Using thumb URL from folder data: {image_url}", xbmc.LOGINFO)
+                
+                    # Fallback to regular paths
+                    if not image_url:
+                        log("No image URL found in folder data, checking file data directly", xbmc.LOGINFO)
+                        
+                        # Check for presentation URLs in the file data
+                        if 'presentation_urls' in data and isinstance(data['presentation_urls'], dict):
+                            log("Found presentation_urls in file data", xbmc.LOGINFO)
+                            if 'image' in data['presentation_urls'] and isinstance(data['presentation_urls']['image'], dict):
+                                image_urls = data['presentation_urls']['image']
+                                log(f"Found image URLs in file data: {image_urls}", xbmc.LOGINFO)
+                                
+                                # Try to get the highest resolution
+                                if '720' in image_urls:
+                                    image_url = image_urls['720']
+                                    log(f"Selected 720p image from file data: {image_url}", xbmc.LOGINFO)
+                                elif '220' in image_urls:
+                                    image_url = image_urls['220']
+                                    log(f"Selected 220p image from file data: {image_url}", xbmc.LOGINFO)
+                                elif '64' in image_urls:
+                                    image_url = image_urls['64']
+                                    log(f"Selected 64p image from file data: {image_url}", xbmc.LOGINFO)
+                                elif '48' in image_urls:
+                                    image_url = image_urls['48']
+                                    log(f"Selected 48p image from file data: {image_url}", xbmc.LOGINFO)
+                        
+                        # Fallback to thumb in file data
+                        if not image_url and 'thumb' in data:
+                            image_url = data['thumb']
+                            log(f"Using thumb URL from file data: {image_url}", xbmc.LOGINFO)
                 
                 if image_url:
                     log(f"Final image URL for ShowPicture: {image_url}", xbmc.LOGINFO)
@@ -748,6 +928,7 @@ else:
                                (file_ext.endswith('.jpg') or file_ext.endswith('.jpeg') or 
                                 file_ext.endswith('.png') or file_ext.endswith('.gif')))
                     is_subtitle = file_ext.endswith('.srt')
+                    is_pdf = file_ext.endswith('.pdf')
                     
                     if is_image:
                         log(f"File is an image: {file_name}", xbmc.LOGINFO)
@@ -757,6 +938,8 @@ else:
                         log(f"File is audio: {file_name}", xbmc.LOGINFO)
                     elif is_subtitle:
                         log(f"File is a subtitle: {file_name}", xbmc.LOGINFO)
+                    elif is_pdf:
+                        log(f"File is a PDF document: {file_name}", xbmc.LOGINFO)
                     
                     # Check for presentation URLs
                     presentation_urls = f.get('presentation_urls', {})
@@ -768,7 +951,7 @@ else:
                     if has_thumb:
                         log(f"File has thumb URL: {file_name}", xbmc.LOGINFO)
                     
-                    if is_video or is_audio or is_image or has_presentation or has_thumb or is_subtitle:
+                    if is_video or is_audio or is_image or has_presentation or has_thumb or is_subtitle or is_pdf:
                         file_id = f.get('id')
                         if not file_id:
                             log(f"Skipping file without ID: {file_name}", xbmc.LOGWARNING)
@@ -833,6 +1016,25 @@ else:
                                 'icon': 'DefaultFile.png',
                                 'thumb': 'DefaultFile.png'
                             })
+                        elif is_pdf:
+                            # Handle PDF files
+                            li.setInfo('video', infoLabels={'title': file_name})
+                            li.setMimeType('image/jpeg')  # Treat as image
+                            # Use thumbnail if available, or default to file icon
+                            if thumbnail:
+                                li.setArt({
+                                    'icon': thumbnail,
+                                    'thumb': thumbnail,
+                                    'poster': thumbnail,
+                                    'fanart': thumbnail
+                                })
+                            else:
+                                li.setArt({
+                                    'icon': 'DefaultPicture.png',
+                                    'thumb': 'DefaultPicture.png'
+                                })
+                            # PDF files should be displayed as images
+                            li.setProperty('IsPlayable', 'True')
                         else:
                             # Handle image files (using video type since picture is not valid)
                             li.setInfo('video', infoLabels={'title': file_name})
