@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <addons>
-    <addon id="plugin.video.seedr" name="Seedr" version="1.0.6" provider-name="Seedr">
+    <addon id="plugin.video.seedr" name="Seedr" version="1.0.7" provider-name="Seedr">
         <requires>
             <import addon="xbmc.python" version="3.0.0" />
             <import addon="script.module.requests" version="2.22.0" />
             <import addon="inputstream.adaptive" version="2.0.0" />
         </requires>
         <extension point="xbmc.python.pluginsource" library="main.py">
-            <provides>video audio image</provides>
+            <provides>video audio </provides>
         </extension>
         <extension point="xbmc.addon.metadata">
             <summary lang="en_GB">Seedr - Stream your cloud media</summary>
