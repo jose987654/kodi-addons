@@ -1,6 +1,26 @@
-# Kodi Addons Repository
+# Seedr Kodi Addons Repository
+
+A Kodi addon that allows you to access and stream your Seedr.cc cloud storage content directly through Kodi.
 
 This repository contains Kodi addons for enhancing your entertainment experience.
+
+## What is Kodi?
+
+Kodi is a free and open-source media player software application developed by the XBMC Foundation. It's a powerful entertainment hub that allows you to:
+
+- Play and view most videos, music, podcasts, and other digital media files
+- Organize and manage your media library
+- Stream content from the internet
+- Customize your experience with addons and skins
+- Run on multiple platforms including Windows, macOS, Linux, Android, and iOS
+
+Kodi is particularly popular among home theater enthusiasts and cord-cutters as it provides a unified interface for accessing various media sources, including local storage, network drives, and online services like Seedr.cc.
+
+## Requirements
+
+- Kodi media center
+- Seedr.cc account
+- Internet connection
 
 ## Quick Downloads
 
@@ -41,6 +61,64 @@ Stream videos, music, and images from your Seedr cloud storage directly to Kodi.
 - Support for SRT subtitles
 - Automatic subtitle matching for videos
 
+## Installation
+
+## First-time Setup
+
+1. Launch the addon from Kodi
+2. You will be presented with a verification URL and code
+3. Visit the provided URL in your web browser
+4. Enter the verification code
+5. The addon will automatically complete the authentication process
+6. Authorize the application to access the files.
+
+## Usage
+
+- Navigate through your Seedr.cc folders using the Kodi interface
+- Video files will be automatically playable
+- Audio files will be available for streaming
+- Use the context menu to refresh the current view or go back to parent directory
+
+### Repository Installation
+
+1. Download the repository zip file ([repository.seedr-1.0.1.zip](repository.seedr-1.0.1.zip))
+2. In Kodi, go to Add-ons > Install from zip file
+3. Select the downloaded zip file
+4. The repository will be installed
+
+### Addon Installation
+
+Once the repository is installed:
+
+1. Go to Add-ons > Install from repository
+2. Select the "Seedr Repository"
+3. Navigate to the addon you want to install
+4. Click "Install"
+
+## Technical Details
+
+The addon uses the Seedr.cc API to:
+
+- Authenticate users through device code flow
+- List folders and files
+- Stream media content
+- Display thumbnails and metadata
+
+## Development Dependencies
+
+- Python 2.7 or 3.x
+- Kodi addon development environment with Python API (`xbmc`, `xbmcaddon`, `xbmcgui`, `xbmcplugin`)
+- `script.module.routing` (Kodi addon dependency)
+
+## Building the Repository
+
+To build/update the repository:
+
+1. Make changes to the addons
+2. Update version numbers in the respective addon.xml files
+3. Run the `update_repo.py` script to update addons.xml and MD5 files
+4. Commit and push changes to GitHub
+
 **What's New in v1.0.11:**
 
 - Updated icon images
@@ -79,32 +157,9 @@ Stream videos, music, and images from your Seedr cloud storage directly to Kodi.
 - Better handling of audio formats
 - Fixed issue with audio files not playing via plugin URL
 
-## Installation
+## Support
 
-### Repository Installation
-
-1. Download the repository zip file ([repository.seedr-1.0.1.zip](repository.seedr-1.0.1.zip))
-2. In Kodi, go to Add-ons > Install from zip file
-3. Select the downloaded zip file
-4. The repository will be installed
-
-### Addon Installation
-
-Once the repository is installed:
-
-1. Go to Add-ons > Install from repository
-2. Select the "Seedr Repository"
-3. Navigate to the addon you want to install
-4. Click "Install"
-
-## Building the Repository
-
-To build/update the repository:
-
-1. Make changes to the addons
-2. Update version numbers in the respective addon.xml files
-3. Run the `update_repo.py` script to update addons.xml and MD5 files
-4. Commit and push changes to GitHub
+For issues or questions, please check the project's issue tracker or contact the maintainers.
 
 ## License
 
