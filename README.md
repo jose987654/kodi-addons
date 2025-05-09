@@ -1,7 +1,5 @@
 # Seedr Kodi Repository
 
-![Seedr Logo](icon.png)
-
 A Kodi addon that allows you to access and stream your Seedr.cc cloud storage content directly through Kodi.
 
 This repository contains Kodi addons for enhancing your entertainment experience.
