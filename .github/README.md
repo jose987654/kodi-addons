@@ -1,44 +1,160 @@
-# Seedr for Kodi
+# Seedr Kodi Repository
 
-![Seedr Logo](../icon.png)
+A Kodi addon that allows you to access and stream your Seedr.cc cloud storage content directly through Kodi.
 
-Stream content from your Seedr.cc cloud storage directly to Kodi.
+This repository contains Kodi addons for enhancing your entertainment experience.
 
-[![GitHub release](https://img.shields.io/badge/release-v1.0.11-blue)](https://github.com/jose987654/kodi-addons/releases)
-[![License: GPL-3.0](https://img.shields.io/badge/License-GPL--3.0-green.svg)](../LICENSE)
+## What is Kodi?
 
-## About
+Kodi is a free and open-source media player software application developed by the XBMC Foundation. It's a powerful entertainment hub that allows you to:
 
-This Kodi addon allows you to access and stream your Seedr.cc cloud storage content directly through the Kodi media center. Stream videos, play audio playlists, view images, and more.
+- Play and view most videos, music, podcasts, and other digital media files
+- Organize and manage your media library
+- Stream content from the internet
+- Customize your experience with addons and skins
+- Run on multiple platforms including Windows, macOS, Linux, Android, and iOS
+
+Kodi is particularly popular among home theater enthusiasts and cord-cutters as it provides a unified interface for accessing various media sources, including local storage, network drives, and online services like Seedr.cc.
+
+## Requirements
+
+- Kodi media center
+- Seedr.cc account
+- Internet connection
+
+## Available Addons
+
+### Seedr Addon
+
+Stream videos, music, and images from your Seedr cloud storage directly to Kodi.
+
+**Features:**
+
+- Stream video files from your Seedr account
+- Listen to audio files
+- View image files
+- Support for SRT subtitles
+- Automatic subtitle matching for videos
 
 ## Installation
 
-**Quick Installation:**
+## First-time Setup
 
-1. Download and install [repository.seedr-1.0.1.zip](https://jose987654.github.io/kodi-addons/repository.seedr-1.0.1.zip)
-2. Install the Seedr addon from the repository
+1. Launch the addon from Kodi
+2. You will be presented with a verification URL and code
+3. Visit the provided URL in your web browser
+4. Enter the verification code
+5. The addon will automatically complete the authentication process
+6. Authorize the application to access the files.
 
-Detailed installation instructions available on the [project homepage](https://jose987654.github.io/kodi-addons/).
+### Repository Installation
 
-## Key Features
+## Method 1: Direct Download and Install
 
-- Stream videos directly from your Seedr.cc account
-- Play audio files with playlist support
-- View images and PDF files
-- Automatic subtitle detection
-- Simple authentication
-- Intuitive navigation
+1. Download the repository zip file ([repository.seedr-1.0.1.zip](../repository.seedr-1.0.1.zip))
+2. In Kodi, go to Add-ons > Install from zip file
+3. Select the downloaded zip file
+4. The repository will be installed, and you can then install the Seedr addon from the repository
 
-## Repository Structure
+## Method 2: Install via File Source
 
-- `/plugin.video.seedr` - Source code for the Seedr addon
-- `/repository.seedr` - Repository addon files
-- `/update_repo.py` - Script for updating repository files
+1. In Kodi, go to Settings > File Manager
+2. Select "Add source"
+3. Enter `https://jose987654.github.io/kodi-addons/` as the path
+4. Name it "Seedr Repository" (or any name you prefer)
+5. Go to Add-ons > Install from zip file
+6. Select "Seedr Repository" (or the name you chose)
+7. Select repository.seedr-1.0.1.zip
+8. Wait for the "Add-on installed" notification
+9. Go to Add-ons > Install from repository
+10. Select "Seedr Repository"
+11. Navigate to Video Add-ons
+12. Select and install the Seedr addon
 
-## Contributing
+### Addon Installation
 
-Contributions are welcome! If you'd like to help improve the addon, please fork the repository and submit a pull request.
+Once the repository is installed:
+
+1. Go to Add-ons > Install from repository
+2. Select the "Seedr Repository"
+3. Navigate to the addon you want to install
+4. Click "Install"
+
+## Quick Downloads
+
+👉 **[DOWNLOAD REPOSITORY.SEEDR-1.0.1.ZIP](repository.seedr-1.0.1.zip)** - Install this first!  
+👉 **[DOWNLOAD PLUGIN.VIDEO.SEEDR-1.0.11.ZIP](plugin.video.seedr-1.0.11.zip)** - Seedr addon
+
+## Repository Navigation
+
+<pre>
+<img src="icons/folder.gif" alt="[DIR]"> <a href="repository.seedr/">repository.seedr/</a>
+<img src="icons/folder.gif" alt="[DIR]"> <a href="plugin.video.seedr/">plugin.video.seedr/</a>
+
+</pre>
+
+## Downloads
+
+### Repository
+
+- [repository.seedr-1.0.1.zip](repository.seedr-1.0.1.zip) - Repository ZIP file
+
+### Addon
+
+- [plugin.video.seedr-1.0.11.zip](plugin.video.seedr-1.0.11.zip) - Seedr Addon ZIP file
+
+## Usage
+
+- Navigate through your Seedr.cc folders using the Kodi interface
+- Video files will be automatically playable
+- Audio files will be available for streaming
+- Use the context menu to refresh the current view or go back to parent directory
+
+## Technical Details
+
+The addon uses the Seedr.cc API to:
+
+- Authenticate users through device code flow
+- List folders and files
+- Stream media content
+- Display thumbnails and metadata
+
+## Development Dependencies
+
+- Python 2.7 or 3.x
+- Kodi addon development environment with Python API (`xbmc`, `xbmcaddon`, `xbmcgui`, `xbmcplugin`)
+- `script.module.routing` (Kodi addon dependency)
+
+## Building the Repository
+
+To build/update the repository:
+
+1. Make changes to the addons
+2. Update version numbers in the respective addon.xml files
+3. Run the `update_repo.py` script to update addons.xml and MD5 files
+4. Commit and push changes to GitHub
+
+**What's New in v1.0.11:**
+
+- Updated icon images
+- Improved user interface
+
+**What's New in v1.0.6:**
+
+- Simplified audio playback with InfoTagMusic
+- Direct media API for reliable audio streaming
+- Combined best approaches from previous versions
+
+**What's New in v1.0.5:**
+
+- Simplified audio playback to most basic form
+- Streamlined approach with direct audio playback
+- Removed excess code for better reliability
+
+## Support
+
+For issues or questions, please check the project's issue tracker or contact the maintainers.
 
 ## License
 
-This project is licensed under the [GPL-3.0 License](../LICENSE).
+This project is licensed under the [GPL-3.0 License](LICENSE).
