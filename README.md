@@ -1,4 +1,6 @@
-# Seedr Kodi Addons Repository
+# Seedr Kodi Repository
+
+![Seedr Logo](icon.png)
 
 A Kodi addon that allows you to access and stream your Seedr.cc cloud storage content directly through Kodi.
 
@@ -80,8 +82,6 @@ Once the repository is installed:
 3. Navigate to the addon you want to install
 4. Click "Install"
 
-
-
 ## Quick Downloads
 
 👉 **[DOWNLOAD REPOSITORY.SEEDR-1.0.1.ZIP](repository.seedr-1.0.1.zip)** - Install this first!  
@@ -102,6 +102,7 @@ Once the repository is installed:
 - [repository.seedr-1.0.1.zip](repository.seedr-1.0.1.zip) - Repository ZIP file
 
 ### Addon
+
 - [plugin.video.seedr-1.0.11.zip](plugin.video.seedr-1.0.11.zip) - Seedr Addon ZIP file
 
 ## Usage
@@ -152,11 +153,10 @@ To build/update the repository:
 - Streamlined approach with direct audio playback
 - Removed excess code for better reliability
 
-
 ## Support
 
 For issues or questions, please check the project's issue tracker or contact the maintainers.
 
 ## License
 
-This project is licensed under the GPL-3.0 License - see the LICENSE file for details.
+This project is licensed under the [GPL-3.0 License](LICENSE).

@@ -1,0 +1,38 @@
+name: Kodi Addon Check
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+jobs:
+  kodi-addon-check:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: "3.9"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install kodi-addon-checker
+
+      - name: Check plugin.video.seedr
+        run: |
+          kodi-addon-checker --branch matrix plugin.video.seedr
+
+      - name: Check repository.seedr
+        run: |
+          kodi-addon-checker --branch matrix repository.seedr
+
+      - name: Verify addon.xml files
+        run: |
+          python -c "import xml.etree.ElementTree as ET; ET.parse('plugin.video.seedr/addon.xml')"
+          python -c "import xml.etree.ElementTree as ET; ET.parse('repository.seedr/addon.xml')"
+          python -c "import xml.etree.ElementTree as ET; ET.parse('addons.xml')"
