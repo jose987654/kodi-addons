@@ -5,20 +5,19 @@ Stream videos, music, and images from your Seedr cloud storage directly to Kodi.
 ## Quick Downloads
 
 👉 **[DOWNLOAD REPOSITORY.SEEDR-1.0.1.ZIP](../repository.seedr-1.0.1.zip)** - Install this first!  
-👉 **[DOWNLOAD PLUGIN.VIDEO.SEEDR-1.0.11.ZIP](plugin.video.seedr-1.0.11.zip)** - Seedr addon
+👉 **[DOWNLOAD PLUGIN.VIDEO.SEEDR-1.1.1.ZIP](plugin.video.seedr-1.1.1.zip)** - Seedr addon
 
 ## Navigation
 
 <pre>
 <img src="../icons/folder.gif" alt="[DIR]"> <a href="../">Parent Directory</a>
-<img src="../icons/folder.gif" alt="[DIR]"> <a href="resources/">resources/</a>
-<img src="../icons/compressed.gif" alt="[ZIP]"> <a href="plugin.video.seedr-1.0.11.zip">plugin.video.seedr-1.0.11.zip</a>
+<img src="../icons/compressed.gif" alt="[ZIP]"> <a href="plugin.video.seedr-1.1.1.zip">plugin.video.seedr-1.1.1.zip</a>
 </pre>
 
 ## Download
 
-- [plugin.video.seedr-1.0.11.zip](../plugin.video.seedr-1.0.11.zip) - Addon ZIP file
-- [plugin.video.seedr-1.0.11.zip.md5](../plugin.video.seedr-1.0.11.zip.md5) - MD5 Checksum: `8F5C5A405ED80B7825AA9D59C3028FC3`
+- [plugin.video.seedr-1.1.1.zip](../plugin.video.seedr-1.1.1.zip) - Addon ZIP file
+- [plugin.video.seedr-1.1.1.zip.md5](../plugin.video.seedr-1.1.1.zip.md5) - MD5 Checksum: `8F5C5A405ED80B7825AA9D59C3028FC3`
 
 ## Features
 
@@ -28,7 +27,7 @@ Stream videos, music, and images from your Seedr cloud storage directly to Kodi.
 - Support for SRT subtitles
 - Automatic subtitle matching for videos
 
-## What's New in v1.0.11
+## What's New in v1.1.1
 
 - Updated icon images
 - Improved user interface

@@ -29,7 +29,7 @@ If applicable, add screenshots to help explain your problem.
 
 - Kodi version: [e.g. 19.4]
 - OS: [e.g. Windows 10, Android 12]
-- Addon version: [e.g. 1.0.11]
+- Addon version: [e.g. 1.1.1]
 - Repository version: [e.g. 1.0.1]
 
 ## Debug Log

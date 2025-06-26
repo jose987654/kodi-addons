@@ -388,16 +388,24 @@ def handle_playback(mode, args, settings, addon_handle):
                     return
             
             elif data.get('is_video', False):
-                # Get the video streaming URL
-                log("Fetching video streaming URL")
-                video_data = call_api(f'/api/v0.1/p/media/fs/item/{file_id}/video/url', settings['access_token'])
-                log(f"Video URL response: {video_data}")
+            # Get the video streaming URL - direct media API call
+                log("Making video API call...", xbmc.LOGWARNING)
+                video_data = call_api(f'/api/v0.1/p/presentations/file/{file_id}/hls', settings['access_token'])
+                log(f"Alternative API response type: {type(video_data)}", xbmc.LOGWARNING)
                 
+                if video_data is None:
+                    log("Alternative API returned None - this indicates a connection or authentication error", xbmc.LOGERROR)
+                elif isinstance(video_data, dict) and video_data.get('error'):
+                    log(f"Alternative API returned error: {video_data.get('error')}", xbmc.LOGERROR)
+                elif isinstance(video_data, dict) and 'url' in video_data:
+                    log(f"Alternative API returned URL: {video_data.get('url')}", xbmc.LOGWARNING)
+                else:
+                    log(f"Alternative API returned unexpected format: {video_data}", xbmc.LOGERROR)
+                               
                 if video_data and not video_data.get('error'):
                     url = video_data.get('url')
                     if url:
-                        log(f"Playing video URL: {url}")
-                        
+                                                
                         # First, check if there's a matching subtitle file in the same folder
                         subtitle_url = None
                         folder_id = data.get('folder_id')
@@ -430,6 +438,14 @@ def handle_playback(mode, args, settings, addon_handle):
                                                     break
                         
                         # Create ListItem with all required properties
+                        log(f"Creating ListItem with alternative API URL: {url}", xbmc.LOGWARNING)
+                        
+                        # Validate the URL format
+                        if not url.startswith('https://'):
+                            log(f"WARNING: URL doesn't start with https: {url}", xbmc.LOGERROR)
+                        if 'master' not in url.lower() and 'm3u8' not in url.lower():
+                            log(f"WARNING: URL doesn't appear to be HLS format: {url}", xbmc.LOGWARNING)
+                                                
                         li = xbmcgui.ListItem(path=url)
                         li.setInfo('video', {'title': data.get('name', 'Unknown Video')})
                         
@@ -457,6 +473,7 @@ def handle_playback(mode, args, settings, addon_handle):
                             })
                         
                         # Set required properties for HLS playback
+                        log("Setting HLS properties for alternative API playback", xbmc.LOGWARNING)
                         li.setProperty('inputstream', 'inputstream.adaptive')
                         li.setProperty('inputstream.adaptive.manifest_type', 'hls')
                         li.setMimeType('application/x-mpegURL')
@@ -468,32 +485,54 @@ def handle_playback(mode, args, settings, addon_handle):
                             li.setSubtitles([subtitle_url])
                         
                         # Resolve the URL first
+                        log("Resolving alternative API URL for playback", xbmc.LOGWARNING)
                         xbmcplugin.setResolvedUrl(addon_handle, True, li)
+                        log("Alternative API playback initiated successfully!", xbmc.LOGWARNING)
                         return
                     else:
-                        # Handle failure case
+                        # Handle failure case - no URL from alternative API
+                        log("FAILED: Alternative API returned no video URL", xbmc.LOGERROR)
                         li = xbmcgui.ListItem()
                         xbmcplugin.setResolvedUrl(addon_handle, False, li)
-                        log("No video URL returned", xbmc.LOGERROR)
-                        show_auto_close_notification(addonname, "Failed to get video URL. Please try again.")
+                        log("No video URL returned from alternative API", xbmc.LOGERROR)
+                        show_auto_close_notification(addonname, "Failed to get video URL from both APIs. Please try again.")
                 else:
-                    # Handle failure case
+                    # Handle failure case - both APIs failed
+                    log("FAILED: API failed", xbmc.LOGERROR)
+                    log(f" API error details: {video_data}", xbmc.LOGERROR)
                     li = xbmcgui.ListItem()
                     xbmcplugin.setResolvedUrl(addon_handle, False, li)
-                    log("Failed to get video URL", xbmc.LOGERROR)
-                    show_auto_close_notification(addonname, "Failed to get video URL. Please try again.")
+                    log("Both video APIs failed", xbmc.LOGERROR)
+                    show_auto_close_notification(addonname, "Failed to get video URL from both APIs. Please try again.")
             elif data.get('is_audio', False):
-                # Get the audio streaming URL - direct media API call
-                log("Fetching audio streaming URL", xbmc.LOGINFO)
-                audio_data = call_api(f'/api/v0.1/p/media/fs/item/{file_id}/video/url', settings['access_token'])
-                log(f"Audio URL response: {audio_data}", xbmc.LOGINFO)
+            # Get the audio streaming URL - direct media API call
                 
+                log("ATTEMPTING AUDIO FALLBACK: Trying download/view endpoint", xbmc.LOGWARNING)                    
+                log("Making  audio API call...", xbmc.LOGWARNING)
+
+                alternative_url = f'/api/v0.1/p/download/file/{file_id}/url'
+                
+                log(f" audio API endpoint: {alternative_url}", xbmc.LOGWARNING)
+                audio_data = call_api(alternative_url, settings['access_token'])
+                log(f" audio URL response: {audio_data}")
+                log(f" audio API response type: {type(audio_data)}", xbmc.LOGWARNING)
+                
+                if audio_data is None:
+                    log(" audio API returned None - this indicates a connection or authentication error", xbmc.LOGERROR)
+                elif isinstance(audio_data, dict) and audio_data.get('error'):
+                    log(f" audio API returned error: {audio_data.get('error')}", xbmc.LOGERROR)
+                elif isinstance(audio_data, dict) and 'url' in audio_data:
+                    log(f" audio API returned URL: {audio_data.get('url')}", xbmc.LOGWARNING)
+                else:
+                    log(f" audio API returned unexpected format: {audio_data}", xbmc.LOGERROR)
+                                                    
                 if audio_data and not audio_data.get('error'):
                     url = audio_data.get('url')
                     if url:
-                        log(f"Playing audio URL: {url}", xbmc.LOGINFO)
-                        
-                        # Create ListItem for simple audio playback with InfoTagMusic
+                        log(f"SUCCESS: API returned audio URL: {url}")                        
+                        log("USING DOWNLOAD/VIEW API URL FOR AUDIO PLAYBACK", xbmc.LOGWARNING)
+                        log(f"Creating audio ListItem with download/view API URL: {url}", xbmc.LOGWARNING)
+                                                    
                         file_name = data.get('name', 'Unknown Audio')
                         current_li = xbmcgui.ListItem(path=url)
                         
@@ -506,7 +545,7 @@ def handle_playback(mode, args, settings, addon_handle):
                             'icon': 'DefaultAudio.png',
                             'thumb': 'DefaultAudio.png'
                         })
-                        
+                                                    
                         # Get folder contents to create playlist
                         folder_id = data.get('folder_id')
                         if folder_id:
@@ -563,21 +602,27 @@ def handle_playback(mode, args, settings, addon_handle):
                                         playlist.add(playlist_item_url, li)
                                     
                                     log(f"Created music playlist with {len(audio_files)} items", xbmc.LOGINFO)
-                        
-                        # Set resolved URL and play directly
-                        xbmcplugin.setResolvedUrl(addon_handle, True, current_li)
-                        return
+                                                
+                            # Set resolved URL and play directly
+                            log("Resolving  download/view audio API URL for playback", xbmc.LOGWARNING)
+                            xbmcplugin.setResolvedUrl(addon_handle, True, current_li)
+                            return
                     else:
+                        # Handle failure case - no URL from  audio API
+                        log("FAILED: audio API returned no URL", xbmc.LOGERROR)
                         li = xbmcgui.ListItem()
                         xbmcplugin.setResolvedUrl(addon_handle, False, li)
-                        log("No audio URL returned", xbmc.LOGERROR)
-                        show_auto_close_notification(addonname, "Failed to get audio URL. Please try again.")
+                        log("No audio URL returned from alternative API", xbmc.LOGERROR)
+                        show_auto_close_notification(addonname, "Failed to get audio URL from both APIs. Please try again.")
                 else:
+                    # Handle failure case - both audio APIs failed
+                    log("FAILED: Both primary and alternative audio APIs failed", xbmc.LOGERROR)
+                    log(f"Alternative audio API error details: {audio_data}", xbmc.LOGERROR)
                     li = xbmcgui.ListItem()
                     xbmcplugin.setResolvedUrl(addon_handle, False, li)
-                    log("Failed to get audio URL", xbmc.LOGERROR)
-                    show_auto_close_notification(addonname, "Failed to get audio URL. Please try again.")
-            else:
+                    log("Both audio APIs failed", xbmc.LOGERROR)
+                    show_auto_close_notification(addonname, "Failed to get audio URL from both APIs. Please try again.")
+            elif data.get('is_image', False):
                 # Handle image files - directly use ShowPicture
                 log("Handling image file", xbmc.LOGINFO)
                 log(f"File ID: {file_id}", xbmc.LOGINFO)
@@ -590,9 +635,6 @@ def handle_playback(mode, args, settings, addon_handle):
                 if is_pdf:
                     log(f"File is a PDF document: {file_name}", xbmc.LOGINFO)
                     # For PDFs, we'll try to display the presentation image
-                    # The presentation image is a thumbnail preview of the PDF
-                    
-                    # We need to get the original file listing to access the presentation URLs
                     image_url = None
                     
                     # First search for the file in the folder contents or root
