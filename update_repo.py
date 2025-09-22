@@ -115,12 +115,19 @@ def create_zipfile(addon_dir):
     # Remove any .pyc files
     cleanup_pyc_files(os.path.join(temp_dir, addon_id))
     
-    # Create ZIP file
+    # Create ZIP file with correct folder structure
     with zipfile.ZipFile(zipfile_name, 'w', zipfile.ZIP_DEFLATED) as zip_ref:
-        for root, dirs, files in os.walk(temp_dir):
+        source_dir = os.path.join(temp_dir, addon_id)
+        # First, write all files from the addon directory
+        for root, dirs, files in os.walk(source_dir):
             for file in files:
                 file_path = os.path.join(root, file)
-                zip_path = os.path.relpath(file_path, temp_dir)
+                # Get path relative to the source directory
+                rel_path = os.path.relpath(file_path, source_dir)
+                # Add to zip with addon_id prefix
+                zip_path = os.path.join(addon_id, rel_path)
+                # Convert to forward slashes for consistency
+                zip_path = zip_path.replace('\\', '/')
                 zip_ref.write(file_path, zip_path)
     
     # Clean up temporary directory
@@ -139,6 +146,14 @@ def main():
     for addon_dir in addon_dirs:
         if os.path.exists(os.path.join(addon_dir, "addon.xml")):
             create_zipfile(addon_dir)
+            # Generate MD5 for the ZIP file
+            addon_xml_root = read_addon_xml(addon_dir)
+            if addon_xml_root is not None:
+                addon_id = addon_xml_root.get("id")
+                addon_version = addon_xml_root.get("version")
+                zip_name = f"{addon_id}-{addon_version}.zip"
+                if os.path.exists(zip_name):
+                    generate_md5_file(zip_name)
     
     print("Repository update completed successfully!")
 

@@ -15,6 +15,13 @@ import urllib
 from urllib.parse import urlparse
 from urllib.parse import urlencode
 from urllib.parse import parse_qs
+from urllib.parse import quote
+import struct
+import base64
+
+class RestartAuthException(Exception):
+    """Custom exception to signal authentication restart"""
+    pass
 
 API_URL = 'https://v2.seedr.cc'
 BASE_URL = 'https://v2.seedr.cc/api/v0.1/p'
@@ -67,23 +74,53 @@ def get_device_code():
     
     params = {
         'client_id': CLIENT_ID,
-        'scope': SCOPES  # Use the SCOPES constant that includes media.read
+        'scope': SCOPES,  # Use the SCOPES constant that includes media.read
+        'response_type': 'device_code'
     }
-    response = fetch_json_dictionary(DEVICE_CODE_URL, params)
-    log(f"Device code response: {response}")
     
-    if 'device_code' not in response:
-        log("Error: No device_code in response", xbmc.LOGERROR)
-        raise Exception("Failed to get device code from Seedr API")
+    headers = {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'User-Agent': 'Kodi/Seedr Addon',
+        'Accept': 'application/json'
+    }
     
-    log(f"Device Code: {response['device_code']}")
-    log(f"User Code: {response['user_code']}")
-    log(f"Verification URI: {response['verification_uri']}")
-    log(f"Expires In: {response['expires_in']}s")
-    log(f"Interval: {response['interval']}s")
-    log(f"Scopes: {response.get('scope', 'No scopes returned')}")
-    
-    return response
+    try:
+        log(f"Making device code request to: {DEVICE_CODE_URL}")
+        log(f"With params: {params}")
+        log(f"With headers: {headers}")
+        
+        response = requests.post(DEVICE_CODE_URL, data=params, headers=headers)
+        
+        log(f"Response status code: {response.status_code}")
+        log(f"Response headers: {dict(response.headers)}")
+        log(f"Response text: {response.text}")
+        
+        if response.status_code != 200:
+            log(f"HTTP Error {response.status_code}: {response.text}", xbmc.LOGERROR)
+            return None
+            
+        response_data = response.json()
+        log(f"Device code response: {response_data}")
+        
+        if 'device_code' not in response_data:
+            log("Error: No device_code in response", xbmc.LOGERROR)
+            return None
+        
+        log(f"Device Code: {response_data['device_code']}")
+        log(f"User Code: {response_data['user_code']}")
+        log(f"Verification URI: {response_data['verification_uri']}")
+        log(f"Expires In: {response_data.get('expires_in', '300')}s")
+        log(f"Interval: {response_data.get('interval', '5')}s")
+        log(f"Scopes: {response_data.get('scope', SCOPES)}")
+        
+        return response_data
+        
+    except requests.exceptions.RequestException as e:
+        log(f"Network error making device code request: {str(e)}", xbmc.LOGERROR)
+        return None
+    except Exception as e:
+        log(f"Error processing device code response: {str(e)}", xbmc.LOGERROR)
+        return None
 
 def get_token(device_code):
     log("--------------------------------------------------")
@@ -94,8 +131,42 @@ def get_token(device_code):
         'device_code': device_code,
         'client_id': CLIENT_ID
     }
-    log(f"Making token request with device_code: {device_code}")
-    return fetch_json_dictionary(TOKEN_URL, params)
+    log(f"Making token request with device_code: {device_code[:10]}...")
+    log(f"Token URL: {TOKEN_URL}")
+    log(f"Token params: {params}")
+    
+    headers = {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'User-Agent': 'Kodi/Seedr Addon',
+        'Accept': 'application/json'
+    }
+    
+    try:
+        response = requests.post(TOKEN_URL, data=params, headers=headers)
+        log(f"Token response status: {response.status_code}")
+        log(f"Token response text: {response.text}")
+        
+        if response.status_code == 200:
+            result = response.json()
+            log(f"Token response data: {result}")
+            return result
+        else:
+            # Handle different error cases
+            try:
+                error_data = response.json()
+                error_msg = error_data.get('error', 'Unknown error')
+                log(f"Token error: {error_msg}", xbmc.LOGERROR)
+                return {'error': error_msg}
+            except:
+                log(f"Token HTTP Error {response.status_code}: {response.text}", xbmc.LOGERROR)
+                return {'error': f'HTTP {response.status_code}'}
+                
+    except requests.exceptions.RequestException as e:
+        log(f"Network error getting token: {str(e)}", xbmc.LOGERROR)
+        return {'error': 'Network error'}
+    except Exception as e:
+        log(f"Error getting token: {str(e)}", xbmc.LOGERROR)
+        return {'error': 'Unknown error'}
 
 def refresh_access_token():
     log("Attempting to refresh access token")
@@ -218,71 +289,82 @@ def get_access_token():
     log("Starting authentication process")
     
     while True:  # Main loop for retrying the entire process
+        log("--------------------------------------------------")
+        log("Starting new authentication attempt")
+        log("--------------------------------------------------")
+        
         device_code_dict = get_device_code()
         if not device_code_dict:
+            log("Failed to get device code", xbmc.LOGERROR)
             if xbmcgui.Dialog().yesno(addonname, "Failed to get device code. Would you like to try again?"):
+                log("User chose to retry device code request")
                 continue
+            log("User cancelled authentication after device code failure")
             return None
             
+        log(f"Successfully got device code: {device_code_dict.get('device_code', '')[:5]}...")
         settings['device_code'] = device_code_dict['device_code']
 
         # Construct full verification URL
         verification_url = API_URL + device_code_dict['verification_uri']
         if 'user_code' in device_code_dict:
             verification_url += '?code=' + device_code_dict['user_code']
+            log(f"Added user code to verification URL: {device_code_dict['user_code']}")
 
         log("--------------------------------------------------")
         log("Step 2: User Interaction Required")
         log("--------------------------------------------------")
-        log(f"Verification URL: {verification_url}")
-        log(f"User Code: {device_code_dict['user_code']}")
+        log(f"Full verification URL: {verification_url}")
+        log(f"User Code for verification: {device_code_dict['user_code']}")
+        log("Displaying QR code dialog to user...")
 
-        message = "To use this Addon, Please Authorize Seedr at:\n\n" + verification_url 
-        xbmcgui.Dialog().ok(addonname, message)
+        # Show QR code dialog with integrated polling
+        log("Starting QR code dialog with background polling...")
 
+        # Start token polling immediately in background
         token_dict = None
         access_token = None
         refresh_token = None
         interval = device_code_dict.get('interval', 5)
         attempts = 0
-        max_attempts = 30
+        max_attempts = 100
         
-        while access_token is None and attempts < max_attempts:
-            attempts += 1
-            log(f"Polling attempt {attempts}")
-            token_dict = get_token(settings['device_code'])
-            
-            if 'error' in token_dict:
-                if token_dict['error'] == 'authorization_pending':
-                    log("Authorization still pending, waiting...")
-                    time.sleep(interval)
-                else:
-                    log(f"Authentication error: {token_dict['error']}", xbmc.LOGERROR)
-                    if xbmcgui.Dialog().yesno(addonname, f"Error: {token_dict['error']}\nWould you like to try again?"):
-                        break  # Break inner loop to restart the process
-                    return None
-            else:
-                access_token = token_dict.get('access_token')
-                refresh_token = token_dict.get('refresh_token')
-                if access_token:
-                    log("Authentication successful!")
-                    log(f"Access token obtained: {access_token[:10]}...")
-                    if refresh_token:
-                        log("Refresh token obtained")
-                        settings['refresh_token'] = refresh_token
-                    break
+        log(f"Starting background token polling with {max_attempts} max attempts, {interval}s interval")
+        
+        # Show QR dialog and start polling simultaneously
+        try:
+            show_qr_code_dialog_with_polling(verification_url, device_code_dict['user_code'], settings['device_code'], interval, max_attempts)
+        except RestartAuthException:
+            # User chose to retry, restart the entire authentication process
+            log("User chose to retry, restarting authentication process")
+            continue
+        
+        # Check if we got the token from the dialog
+        if 'access_token' in settings and settings['access_token']:
+            access_token = settings['access_token']
+            if 'refresh_token' in settings:
+                refresh_token = settings['refresh_token']
+            log("Authentication completed successfully from QR dialog")
+        else:
+            log("Authentication failed or was cancelled")
+            return None
 
         if access_token:
             settings['access_token'] = access_token
             save_dict(settings, data_file)
+            log("Authentication completed successfully, returning access token")
             return access_token
             
         if attempts >= max_attempts:
+            log("Authorization timed out after maximum attempts", xbmc.LOGERROR)
             if xbmcgui.Dialog().yesno(addonname, "Authorization timed out. Would you like to try again?"):
+                log("User chose to retry after timeout")
                 continue
+            log("User cancelled after timeout")
             return None
             
         # If we get here, user chose to retry after an error
+        log("Restarting authentication process due to user retry")
         continue
 
 def show_auto_close_notification(heading, message, duration=5):
@@ -293,6 +375,442 @@ def show_auto_close_notification(heading, message, duration=5):
             break
         xbmc.sleep(1000)  # Sleep for 1 second
     dialog.close()
+
+def create_qr_code(verification_url, temp_path, size=400):
+    """Create QR code using QR Server API with specific styling"""
+    try:
+        log(f"Creating QR code for: {verification_url}")
+        
+        # Use QR Server API with custom styling for Kodi theme
+        encoded_url = quote(verification_url, safe='')
+        qr_url = f"https://api.qrserver.com/v1/create-qr-code/?size={size}x{size}&data={encoded_url}&format=png&bgcolor=000000&color=FFFFFF&margin=1"
+        
+        log(f"Requesting QR code from: {qr_url}")
+        response = requests.get(qr_url, timeout=10)
+        response.raise_for_status()
+        
+        with open(temp_path, 'wb') as f:
+            f.write(response.content)
+        
+        log(f"QR code saved to: {temp_path}")
+        return True
+        
+    except Exception as e:
+        log(f"Error creating QR code: {str(e)}", xbmc.LOGERROR)
+        return False
+
+class QRAuthDialogWithPolling(xbmcgui.WindowDialog):
+    """Custom QR code authentication dialog with background token polling"""
+    def __init__(self, qr_image_path, verification_url, user_code, device_code, interval, max_attempts):
+        super(QRAuthDialogWithPolling, self).__init__()
+        self.device_code = device_code
+        self.interval = interval
+        self.max_attempts = max_attempts
+        self.authenticated = False
+        
+        # Get screen dimensions
+        self.width = 1280
+        self.height = 720
+        
+        # Calculate positions
+        qr_size = 300  # QR code size
+        padding = 40   # Padding between elements
+        
+        # Background
+        background = xbmcgui.ControlImage(0, 0, self.width, self.height, '')
+        self.addControl(background)
+        background.setColorDiffuse('FF2C2C2C')  # Dark gray background
+        
+        # Title
+        title = xbmcgui.ControlLabel(padding, padding, self.width, 30, "QR Code Authentication", 'font14', '0xFFFFFFFF')
+        self.addControl(title)
+        
+        # Left side - QR Code
+        qr_x = padding
+        qr_y = padding + 60
+        qr_image = xbmcgui.ControlImage(qr_x, qr_y, qr_size, qr_size, qr_image_path)
+        self.addControl(qr_image)
+        
+        # QR Code label
+        qr_label = xbmcgui.ControlLabel(qr_x, qr_y + qr_size + 20, qr_size, 30, 
+                                      "Scan this QR code with your mobile device", 'font12', '0xFFFFFFFF', alignment=2)
+        self.addControl(qr_label)
+        
+        # Right side - Instructions
+        text_x = qr_x + qr_size + padding * 2
+        text_y = qr_y
+        text_width = self.width - text_x - padding
+        
+        # Option 2 header
+        option2_label = xbmcgui.ControlLabel(text_x, text_y, text_width, 30, 
+                                           "Option 2: Visit URL manually", 'font13', '0xFFFFFFFF')
+        self.addControl(option2_label)
+        
+        # URL box
+        url_y = text_y + 50
+        url_height = 40
+        url_background = xbmcgui.ControlImage(text_x, url_y, text_width, url_height, '')
+        self.addControl(url_background)
+        url_background.setColorDiffuse('FF3C3C3C')  # Slightly lighter gray for URL box
+        
+        # URL text
+        url_label = xbmcgui.ControlLabel(text_x + 10, url_y + 10, text_width - 20, 30, 
+                                       verification_url, 'font12', '0xFFFFFFFF')
+        self.addControl(url_label)
+        
+        # Instructions for manual login
+        code_y = url_y + url_height + 30
+        code_label = xbmcgui.ControlLabel(text_x, code_y, text_width, 60, 
+                                        "Visit the URL above and login to authorize this device", 'font12', '0xFFFFFFFF')
+        self.addControl(code_label)
+        
+        # Status label
+        status_y = code_y + 80
+        self.status_label = xbmcgui.ControlLabel(text_x, status_y, text_width, 30, 
+                                               "Waiting for authorization...", 'font13', '0xFFFFFFFF')
+        self.addControl(self.status_label)
+        
+        # Cancel button
+        button_width = 200
+        button_height = 50
+        button_x = (self.width - button_width) // 2
+        button_y = self.height - button_height - padding
+        self.cancel_button = xbmcgui.ControlButton(button_x, button_y, button_width, button_height, 
+                                                 "Cancel", alignment=2, focusTexture='', noFocusTexture='')
+        self.addControl(self.cancel_button)
+        self.cancel_button.setVisible(True)
+        self.setFocus(self.cancel_button)
+        
+        # Start background polling after a short delay
+        xbmc.sleep(2000)  # Wait 2 seconds before starting polling
+        self.start_polling()
+    
+    def start_polling(self):
+        """Start background token polling"""
+        import threading
+        
+        def poll_for_token():
+            attempts = 0
+            while attempts < self.max_attempts and not self.authenticated:
+                attempts += 1
+                log(f"Background polling attempt {attempts}/{self.max_attempts}")
+                
+                # Update status
+                self.status_label.setLabel(f"Checking authorization... ({attempts}/{self.max_attempts})")
+                
+                token_dict = get_token(self.device_code)
+                
+                if 'error' in token_dict:
+                    if token_dict['error'] == 'authorization_pending':
+                        log(f"Authorization still pending, waiting {self.interval}s...")
+                        self.status_label.setLabel(f"Waiting for authorization... ({attempts}/{self.max_attempts})")
+                        time.sleep(self.interval)
+                    elif token_dict['error'] == 'authorization_declined':
+                        log("User declined authorization", xbmc.LOGWARNING)
+                        self.status_label.setLabel("Authorization declined. Please try again.")
+                        break
+                    elif token_dict['error'] == 'expired_token':
+                        log("Device code expired", xbmc.LOGWARNING)
+                        self.status_label.setLabel("Code expired. Please restart authentication.")
+                        break
+                    else:
+                        log(f"Authentication error: {token_dict['error']}", xbmc.LOGERROR)
+                        self.status_label.setLabel(f"Error: {token_dict['error']}")
+                        # Don't break immediately, continue polling for a few more attempts
+                        if attempts >= 5:  # Only break after 5 attempts with error
+                            break
+                        time.sleep(self.interval)
+                else:
+                    access_token = token_dict.get('access_token')
+                    refresh_token = token_dict.get('refresh_token')
+                    if access_token:
+                        log("Authentication successful in background!")
+                        settings['access_token'] = access_token
+                        if refresh_token:
+                            settings['refresh_token'] = refresh_token
+                        save_dict(settings, data_file)
+                        self.authenticated = True
+                        self.status_label.setLabel("Authentication successful! Closing...")
+                        # Close dialog after short delay
+                        xbmc.sleep(1000)
+                        self.close()
+                        break
+            
+            # If we reach here and not authenticated, show retry option
+            if not self.authenticated:
+                log("Polling completed without authentication")
+                self.status_label.setLabel("Authorization timed out.")
+                xbmc.sleep(2000)  # Wait 2 seconds before showing retry dialog
+                try:
+                    self.show_retry_dialog()
+                except RestartAuthException:
+                    # This will be caught by the main authentication loop
+                    pass
+        
+        # Start polling thread
+        self.poll_thread = threading.Thread(target=poll_for_token)
+        self.poll_thread.daemon = True
+        self.poll_thread.start()
+    
+    def show_retry_dialog(self):
+        """Show retry dialog when polling times out"""
+        self.close()  # Close the QR dialog first
+        
+        # Show retry dialog
+        retry_msg = "Authorization timed out after 100 attempts.\n\nWould you like to try again with a new QR code?"
+        if xbmcgui.Dialog().yesno("Seedr Authentication", retry_msg):
+            log("User chose to retry authentication - restarting process")
+            # Set a flag to indicate retry is needed
+            settings['retry_auth'] = True
+            save_dict(settings, data_file)
+            # Trigger a restart by raising a custom exception
+            raise RestartAuthException("User requested retry")
+        else:
+            log("User cancelled retry")
+            settings['retry_auth'] = False
+            save_dict(settings, data_file)
+    
+    def onControl(self, control):
+        if control == self.cancel_button:
+            self.close()
+    
+    def onAction(self, action):
+        if action.getId() in [xbmcgui.ACTION_PREVIOUS_MENU, xbmcgui.ACTION_NAV_BACK]:
+            self.close()
+
+class QRAuthDialog(xbmcgui.WindowDialog):
+    """Custom QR code authentication dialog with side-by-side layout"""
+    def __init__(self, qr_image_path, verification_url, user_code):
+        super(QRAuthDialog, self).__init__()
+        # Get screen dimensions
+        self.width = 1280
+        self.height = 720
+        
+        # Calculate positions
+        qr_size = 300  # QR code size
+        padding = 40   # Padding between elements
+        
+        # Background
+        background = xbmcgui.ControlImage(0, 0, self.width, self.height, '')
+        self.addControl(background)
+        background.setColorDiffuse('FF2C2C2C')  # Dark gray background
+        
+        # Title
+        title = xbmcgui.ControlLabel(padding, padding, self.width, 30, __language__(32100), 'font14', '0xFFFFFFFF')
+        self.addControl(title)
+        
+        # Left side - QR Code
+        qr_x = padding
+        qr_y = padding + 60
+        qr_image = xbmcgui.ControlImage(qr_x, qr_y, qr_size, qr_size, qr_image_path)
+        self.addControl(qr_image)
+        
+        # QR Code label
+        qr_label = xbmcgui.ControlLabel(qr_x, qr_y + qr_size + 20, qr_size, 30, 
+                                      __language__(32102), 'font12', '0xFFFFFFFF', alignment=2)
+        self.addControl(qr_label)
+        
+        # Right side - Instructions
+        text_x = qr_x + qr_size + padding * 2
+        text_y = qr_y
+        text_width = self.width - text_x - padding
+        
+        # Option 2 header
+        option2_label = xbmcgui.ControlLabel(text_x, text_y, text_width, 30, 
+                                           "Option 2: Visit URL manually", 'font13', '0xFFFFFFFF')
+        self.addControl(option2_label)
+        
+        # URL box
+        url_y = text_y + 50
+        url_height = 40
+        url_background = xbmcgui.ControlImage(text_x, url_y, text_width, url_height, '')
+        self.addControl(url_background)
+        url_background.setColorDiffuse('FF3C3C3C')  # Slightly lighter gray for URL box
+        
+        # URL text
+        url_label = xbmcgui.ControlLabel(text_x + 10, url_y + 10, text_width - 20, 30, 
+                                       verification_url, 'font12', '0xFFFFFFFF')
+        self.addControl(url_label)
+        
+        # User code instructions
+        code_y = url_y + url_height + 30
+        code_label = xbmcgui.ControlLabel(text_x, code_y, text_width, 30, 
+                                        "Enter this code when asked:", 'font12', '0xFFFFFFFF')
+        self.addControl(code_label)
+        
+        # User code display
+        code_box_y = code_y + 40
+        code_box_height = 50
+        code_background = xbmcgui.ControlImage(text_x, code_box_y, text_width, code_box_height, '')
+        self.addControl(code_background)
+        code_background.setColorDiffuse('FF3C3C3C')
+        
+        # Format user code with spaces between characters
+        formatted_code = ' '.join(user_code)
+        code_text = xbmcgui.ControlLabel(text_x, code_box_y + 10, text_width, 30, 
+                                       formatted_code, 'font16', '0xFFFFFFFF', alignment=2)
+        self.addControl(code_text)
+        
+        # OK button
+        button_width = 200
+        button_height = 50
+        button_x = (self.width - button_width) // 2
+        button_y = self.height - button_height - padding
+        self.ok_button = xbmcgui.ControlButton(button_x, button_y, button_width, button_height, 
+                                             "OK", alignment=2, focusTexture='', noFocusTexture='')
+        self.addControl(self.ok_button)
+        self.ok_button.setVisible(True)
+        self.setFocus(self.ok_button)
+    
+    def onControl(self, control):
+        if control == self.ok_button:
+            self.close()
+    
+    def onAction(self, action):
+        if action.getId() in [xbmcgui.ACTION_PREVIOUS_MENU, xbmcgui.ACTION_NAV_BACK]:
+            self.close()
+
+def show_qr_code_dialog_with_polling(verification_url, user_code, device_code, interval, max_attempts):
+    """Show QR dialog with background token polling"""
+    try:
+        # Create temporary file path for QR image
+        temp_dir = xbmcvfs.translatePath('special://temp/')
+        qr_image_path = os.path.join(temp_dir, 'seedr_qr_code.png')
+        
+        # Generate QR code using QR server
+        qr_image_loaded = create_qr_code(verification_url, qr_image_path, 400)
+        
+        if qr_image_loaded and os.path.exists(qr_image_path):
+            # Show custom dialog with polling
+            dialog = QRAuthDialogWithPolling(qr_image_path, verification_url, user_code, device_code, interval, max_attempts)
+            dialog.doModal()
+            dialog.close()
+            
+        else:
+            # Fallback to text-only dialog with polling
+            log("QR code image failed to load, showing text-only dialog with polling", xbmc.LOGWARNING)
+            show_text_dialog_with_polling(verification_url, user_code, device_code, interval, max_attempts)
+        
+        # Clean up temporary file
+        if os.path.exists(qr_image_path):
+            try:
+                os.remove(qr_image_path)
+                log("Cleaned up temporary QR image file")
+            except Exception as e:
+                log(f"Error cleaning up QR image file: {str(e)}", xbmc.LOGWARNING)
+        
+        return True
+        
+    except Exception as e:
+        log(f"Error showing QR code dialog with polling: {str(e)}", xbmc.LOGERROR)
+        # Ultimate fallback to simple dialog
+        message = f"To use this Addon, Please Authorize Seedr at:\n\n{verification_url}\n\nUser Code: {user_code}"
+        xbmcgui.Dialog().ok(addonname, message)
+        return False
+
+def show_text_dialog_with_polling(verification_url, user_code, device_code, interval, max_attempts):
+    """Show text-only dialog with background polling"""
+    try:
+        # Start polling in background
+        import threading
+        
+        def poll_for_token():
+            attempts = 0
+            while attempts < max_attempts:
+                attempts += 1
+                log(f"Background polling attempt {attempts}/{max_attempts}")
+                
+                token_dict = get_token(device_code)
+                
+                if 'error' in token_dict:
+                    if token_dict['error'] == 'authorization_pending':
+                        log(f"Authorization still pending, waiting {interval}s...")
+                        time.sleep(interval)
+                    else:
+                        log(f"Authentication error: {token_dict['error']}", xbmc.LOGERROR)
+                        break
+                else:
+                    access_token = token_dict.get('access_token')
+                    refresh_token = token_dict.get('refresh_token')
+                    if access_token:
+                        log("Authentication successful in background!")
+                        settings['access_token'] = access_token
+                        if refresh_token:
+                            settings['refresh_token'] = refresh_token
+                        save_dict(settings, data_file)
+                        break
+        
+        # Start polling thread
+        poll_thread = threading.Thread(target=poll_for_token)
+        poll_thread.daemon = True
+        poll_thread.start()
+        
+        # Show text dialog
+        message_lines = [
+            "Authentication Required",
+            "",
+            "Visit this URL manually:",
+            verification_url,
+            "",
+            f"User Code: {user_code}",
+            "",
+            "The addon will automatically continue once you complete authorization in your browser."
+        ]
+        message = "\n".join(message_lines)
+        xbmcgui.Dialog().ok("Seedr Authentication", message)
+        
+        # Wait for polling to complete
+        poll_thread.join(timeout=30)  # Wait up to 30 seconds
+        
+    except Exception as e:
+        log(f"Error in text dialog with polling: {str(e)}", xbmc.LOGERROR)
+
+def show_qr_code_dialog(verification_url, user_code):
+    """Show custom dialog with QR code and instructions side by side"""
+    try:
+        # Create temporary file path for QR image
+        temp_dir = xbmcvfs.translatePath('special://temp/')
+        qr_image_path = os.path.join(temp_dir, 'seedr_qr_code.png')
+        
+        # Generate QR code using QR server
+        qr_image_loaded = create_qr_code(verification_url, qr_image_path, 400)
+        
+        if qr_image_loaded and os.path.exists(qr_image_path):
+            # Show custom dialog
+            dialog = QRAuthDialog(qr_image_path, verification_url, user_code)
+            dialog.doModal()
+            dialog.close()
+            
+        else:
+            # Fallback to text-only dialog
+            log("QR code image failed to load, showing text-only dialog", xbmc.LOGWARNING)
+            message_lines = [
+                __language__(32106),  # "Failed to load QR code. Please use the URL above."
+                "",
+                __language__(32103),  # "Or visit this URL manually:"
+                verification_url,
+                "",
+                __language__(32104) + " " + user_code  # "User Code: XXXX"
+            ]
+            message = "\n".join(message_lines)
+            xbmcgui.Dialog().ok(__language__(32100), message)
+        
+        # Clean up temporary file
+        if os.path.exists(qr_image_path):
+            try:
+                os.remove(qr_image_path)
+                log("Cleaned up temporary QR image file")
+            except Exception as e:
+                log(f"Error cleaning up QR image file: {str(e)}", xbmc.LOGWARNING)
+        
+        return True
+        
+    except Exception as e:
+        log(f"Error showing QR code dialog: {str(e)}", xbmc.LOGERROR)
+        # Ultimate fallback to simple dialog
+        message = f"To use this Addon, Please Authorize Seedr at:\n\n{verification_url}\n\nUser Code: {user_code}"
+        xbmcgui.Dialog().ok(addonname, message)
+        return False
 
 addon = xbmcaddon.Addon()
 addonname = addon.getAddonInfo('name')
