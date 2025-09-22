@@ -339,6 +339,20 @@ def get_access_token():
             log("User chose to retry, restarting authentication process")
             continue
         
+        # Check if user requested retry after dialog closed
+        if settings.get('retry_auth', False):
+            log("Retry flag detected - restarting authentication process")
+            settings['retry_auth'] = False  # Clear the flag
+            save_dict(settings, data_file)
+            continue
+        
+        # Check if user cancelled authentication
+        if settings.get('cancel_auth', False):
+            log("User cancelled authentication - exiting")
+            settings['cancel_auth'] = False  # Clear the flag
+            save_dict(settings, data_file)
+            return None
+        
         # Check if we got the token from the dialog
         if 'access_token' in settings and settings['access_token']:
             access_token = settings['access_token']
@@ -441,33 +455,37 @@ class QRAuthDialogWithPolling(xbmcgui.WindowDialog):
         text_y = qr_y
         text_width = self.width - text_x - padding
         
-        # Option 2 header
-        option2_label = xbmcgui.ControlLabel(text_x, text_y, text_width, 30, 
-                                           "Option 2: Visit URL manually", 'font13', '0xFFFFFFFF')
+        # Center the text content vertically in the right panel
+        content_height = 300  # Total height of content
+        center_y = qr_y + (qr_size - content_height) // 2
+        
+        # Option 2 header - bigger and centered
+        option2_label = xbmcgui.ControlLabel(text_x, center_y, text_width, 40, 
+                                           "Option 2: Visit URL manually", 'font16', '0xFFFFFFFF', alignment=2)
         self.addControl(option2_label)
         
-        # URL box
-        url_y = text_y + 50
-        url_height = 40
+        # URL box - bigger
+        url_y = center_y + 60
+        url_height = 60
         url_background = xbmcgui.ControlImage(text_x, url_y, text_width, url_height, '')
         self.addControl(url_background)
         url_background.setColorDiffuse('FF3C3C3C')  # Slightly lighter gray for URL box
         
-        # URL text
-        url_label = xbmcgui.ControlLabel(text_x + 10, url_y + 10, text_width - 20, 30, 
-                                       verification_url, 'font12', '0xFFFFFFFF')
+        # URL text - bigger font
+        url_label = xbmcgui.ControlLabel(text_x + 15, url_y + 15, text_width - 30, 30, 
+                                       verification_url, 'font14', '0xFFFFFFFF', alignment=2)
         self.addControl(url_label)
         
-        # Instructions for manual login
-        code_y = url_y + url_height + 30
-        code_label = xbmcgui.ControlLabel(text_x, code_y, text_width, 60, 
-                                        "Visit the URL above and login to authorize this device", 'font12', '0xFFFFFFFF')
+        # Instructions for manual login - bigger and centered
+        code_y = url_y + url_height + 40
+        code_label = xbmcgui.ControlLabel(text_x, code_y, text_width, 80, 
+                                        "Visit the URL above and login to authorize this device", 'font14', '0xFFFFFFFF', alignment=2)
         self.addControl(code_label)
         
-        # Status label
-        status_y = code_y + 80
-        self.status_label = xbmcgui.ControlLabel(text_x, status_y, text_width, 30, 
-                                               "Waiting for authorization...", 'font13', '0xFFFFFFFF')
+        # Status label - bigger and centered
+        status_y = code_y + 100
+        self.status_label = xbmcgui.ControlLabel(text_x, status_y, text_width, 40, 
+                                               "Waiting for authorization...", 'font15', '0xFFFFFFFF', alignment=2)
         self.addControl(self.status_label)
         
         # Cancel button
@@ -541,11 +559,7 @@ class QRAuthDialogWithPolling(xbmcgui.WindowDialog):
                 log("Polling completed without authentication")
                 self.status_label.setLabel("Authorization timed out.")
                 xbmc.sleep(2000)  # Wait 2 seconds before showing retry dialog
-                try:
-                    self.show_retry_dialog()
-                except RestartAuthException:
-                    # This will be caught by the main authentication loop
-                    pass
+                self.show_retry_dialog()
         
         # Start polling thread
         self.poll_thread = threading.Thread(target=poll_for_token)
@@ -560,22 +574,32 @@ class QRAuthDialogWithPolling(xbmcgui.WindowDialog):
         retry_msg = "Authorization timed out after 100 attempts.\n\nWould you like to try again with a new QR code?"
         if xbmcgui.Dialog().yesno("Seedr Authentication", retry_msg):
             log("User chose to retry authentication - restarting process")
-            # Set a flag to indicate retry is needed
+            # Set flags to indicate retry is needed
             settings['retry_auth'] = True
+            settings['cancel_auth'] = False  # Make sure cancel flag is cleared
             save_dict(settings, data_file)
-            # Trigger a restart by raising a custom exception
-            raise RestartAuthException("User requested retry")
+            log("Retry flags set, authentication will restart")
         else:
-            log("User cancelled retry")
+            log("User cancelled retry - exiting authentication")
             settings['retry_auth'] = False
+            settings['cancel_auth'] = True  # Set flag to indicate user cancelled
             save_dict(settings, data_file)
+            # Don't raise exception, just return - this will end authentication
     
     def onControl(self, control):
         if control == self.cancel_button:
+            log("User clicked Cancel button - stopping authentication")
+            self.authenticated = False
+            settings['cancel_auth'] = True  # Set flag to indicate user cancelled
+            save_dict(settings, data_file)
             self.close()
     
     def onAction(self, action):
         if action.getId() in [xbmcgui.ACTION_PREVIOUS_MENU, xbmcgui.ACTION_NAV_BACK]:
+            log("User pressed back/escape - stopping authentication")
+            self.authenticated = False
+            settings['cancel_auth'] = True  # Set flag to indicate user cancelled
+            save_dict(settings, data_file)
             self.close()
 
 class QRAuthDialog(xbmcgui.WindowDialog):
