@@ -115,17 +115,17 @@ def create_zipfile(addon_dir):
     # Remove any .pyc files
     cleanup_pyc_files(os.path.join(temp_dir, addon_id))
     
-    # Create ZIP file with correct folder structure
+    # Create ZIP file with files at root level
     with zipfile.ZipFile(zipfile_name, 'w', zipfile.ZIP_DEFLATED) as zip_ref:
         source_dir = os.path.join(temp_dir, addon_id)
-        # First, write all files from the addon directory
+        # Write all files from the addon directory directly to root
         for root, dirs, files in os.walk(source_dir):
             for file in files:
                 file_path = os.path.join(root, file)
                 # Get path relative to the source directory
                 rel_path = os.path.relpath(file_path, source_dir)
-                # Add to zip with addon_id prefix
-                zip_path = os.path.join(addon_id, rel_path)
+                # Add to zip at root level (no addon_id prefix)
+                zip_path = rel_path
                 # Convert to forward slashes for consistency
                 zip_path = zip_path.replace('\\', '/')
                 zip_ref.write(file_path, zip_path)
