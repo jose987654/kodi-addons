@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Seedr Kodi Repository</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f6f8fa;
+            color: #24292e;
+            line-height: 1.6;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px 30px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .header h1 {
+            margin: 0 0 10px 0;
+            font-size: 2.5em;
+        }
+
+        .header p {
+            margin: 0;
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .download-section {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .download-button {
+            display: inline-block;
+            background: #28a745;
+            color: white;
+            padding: 15px 30px;
+            text-decoration: none;
+            border-radius: 6px;
+            margin: 10px 10px 10px 0;
+            font-weight: 600;
+            transition: background 0.3s;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .download-button:hover {
+            background: #218838;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        .download-button.primary {
+            background: #0366d6;
+        }
+
+        .download-button.primary:hover {
+            background: #0256c7;
+        }
+
+        .file-list {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .file-item {
+            padding: 12px;
+            border-bottom: 1px solid #e1e4e8;
+            display: flex;
+            align-items: center;
+        }
+
+        .file-item:last-child {
+            border-bottom: none;
+        }
+
+        .file-item img {
+            margin-right: 10px;
+            width: 20px;
+            height: 20px;
+        }
+
+        .file-item a {
+            color: #0366d6;
+            text-decoration: none;
+            flex-grow: 1;
+        }
+
+        .file-item a:hover {
+            text-decoration: underline;
+        }
+
+        .info-section {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .info-section h2 {
+            margin-top: 0;
+            color: #0366d6;
+            border-bottom: 2px solid #0366d6;
+            padding-bottom: 10px;
+        }
+
+        .info-section ul {
+            padding-left: 20px;
+        }
+
+        .info-section li {
+            margin-bottom: 8px;
+        }
+
+        .badge {
+            display: inline-block;
+            background: #6f42c1;
+            color: white;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.85em;
+            margin-left: 10px;
+        }
+
+        .installation-steps {
+            background: #f1f8ff;
+            border-left: 4px solid #0366d6;
+            padding: 15px 20px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+
+        .installation-steps ol {
+            margin: 10px 0;
+            padding-left: 20px;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            padding: 20px;
+            color: #586069;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="header">
+        <h1>🎬 Seedr Kodi Repository</h1>
+        <p>Stream your Seedr.cc cloud storage directly through Kodi</p>
+    </div>
+
+    <div class="download-section">
+        <h2>📦 Quick Downloads</h2>
+        <a href="repository.seedr-1.0.2.zip" class="download-button primary">
+            📥 REPOSITORY.SEEDR-1.0.2.ZIP
+        </a>
+        <span class="badge">Install This First!</span>
+        <br>
+        <a href="plugin.video.seedr-1.2.0.zip" class="download-button">
+            📥 PLUGIN.VIDEO.SEEDR-1.2.0.ZIP
+        </a>
+        <span class="badge">Latest Version</span>
+    </div>
+
+    <div class="info-section">
+        <h2>✨ Features</h2>
+        <ul>
+            <li>Stream video files from your Seedr account</li>
+            <li>Listen to audio files with playlist support</li>
+            <li>View image files and PDF previews</li>
+            <li>Support for SRT subtitles</li>
+            <li>Automatic subtitle matching for videos</li>
+        </ul>
+    </div>
+
+    <div class="info-section">
+        <h2>🚀 Installation Methods</h2>
+
+        <div class="installation-steps">
+            <h3>Method 1: Direct Download and Install</h3>
+            <ol>
+                <li>Download <a href="plugin.video.seedr-1.2.0.zip">plugin.video.seedr-1.2.0.zip</a></li>
+                <li>In Kodi, go to <strong>Add-ons > Install from zip file</strong></li>
+                <li>Select the downloaded zip file</li>
+                <li>The addon will be installed directly</li>
+            </ol>
+        </div>
+
+        <div class="installation-steps">
+            <h3>Method 2: Install Repository First</h3>
+            <ol>
+                <li>Download <a href="repository.seedr-1.0.2.zip">repository.seedr-1.0.2.zip</a></li>
+                <li>In Kodi, go to <strong>Add-ons > Install from zip file</strong></li>
+                <li>Select the repository.seedr-1.0.2.zip</li>
+                <li>Wait for the "Add-on installed" notification</li>
+                <li>Go to <strong>Add-ons > Install from repository</strong></li>
+                <li>Select "Seedr Repository"</li>
+                <li>Navigate to Video Add-ons and install Seedr</li>
+            </ol>
+        </div>
+
+        <div class="installation-steps">
+            <h3>Method 3: Install via File Source (Online)</h3>
+            <ol>
+                <li>In Kodi, go to <strong>Settings > File Manager</strong></li>
+                <li>Select "Add source"</li>
+                <li>Enter <code>https://jose987654.github.io/kodi-addons/</code> as the path</li>
+                <li>Name it "Seedr Repository"</li>
+                <li>Go to <strong>Add-ons > Install from zip file</strong></li>
+                <li>Select "Seedr Repository"</li>
+                <li>Select repository.seedr-1.0.2.zip</li>
+                <li>Install the Seedr addon from the repository</li>
+            </ol>
+        </div>
+
+        <p><strong>Note:</strong> If you have issues with paths containing spaces, copy the ZIP file to a simple path
+            like <code>D:\kodi-addons-install\</code> before installing.</p>
+    </div>
+
+    <div class="info-section">
+        <h2>📋 What's New in v1.2.0</h2>
+        <ul>
+            <li>Fixed critical indentation errors in main.py</li>
+            <li>Improved code stability and reliability</li>
+            <li>Better error handling for authentication flow</li>
+            <li>Enhanced compatibility with Kodi installation process</li>
+            <li>Resolved Python syntax errors preventing addon from loading</li>
+        </ul>
+    </div>
+
+    <div class="file-list">
+        <h2>📂 Repository Files</h2>
+        <div class="file-item">
+            <img src="icons/compressed.gif" alt="[ZIP]">
+            <a href="repository.seedr-1.0.2.zip">repository.seedr-1.0.2.zip</a>
+        </div>
+        <div class="file-item">
+            <img src="icons/compressed.gif" alt="[ZIP]">
+            <a href="plugin.video.seedr-1.2.0.zip">plugin.video.seedr-1.2.0.zip</a>
+        </div>
+        <div class="file-item">
+            <img src="icons/folder.gif" alt="[DIR]">
+            <a href="repository.seedr/">repository.seedr/</a>
+        </div>
+        <div class="file-item">
+            <img src="icons/folder.gif" alt="[DIR]">
+            <a href="plugin.video.seedr/">plugin.video.seedr/</a>
+        </div>
+        <div class="file-item">
+            <img src="icons/blank.gif" alt="[FILE]">
+            <a href="addons.xml">addons.xml</a>
+        </div>
+    </div>
+
+    <footer>
+        <p>📺 <strong>Requirements:</strong> Kodi 19.0 (Matrix) or higher | Seedr.cc account | Internet connection</p>
+        <p>📄 Licensed under <a href="LICENSE">GPL-3.0 License</a></p>
+        <p>🔗 <a href="https://github.com/jose987654/kodi-addons">View on GitHub</a></p>
+    </footer>
+</body>
+
+</html>
