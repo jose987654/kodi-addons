@@ -51,7 +51,7 @@ Stream videos, music, and images from your Seedr cloud storage directly to Kodi.
 
 ## Method 1: Direct Download and Install
 
-1. Download the plugin.video zip file ([plugin.video.seedr-1.2.0.zip](/plugin.video.seedr-1.2.0.zip))
+1. Download the plugin.video zip file ([plugin.video.seedr-1.2.0.zip](/plugin.video.seedr/plugin.video.seedr-1.2.0.zip))
 2. In Kodi, go to Add-ons > Install from zip file
 3. Select the downloaded zip file
 4. The addon will be installed directly
@@ -60,7 +60,7 @@ Stream videos, music, and images from your Seedr cloud storage directly to Kodi.
 
 ## Method 2: Install Repository First, Then Addon
 
-1. Download the repository zip file ([repository.seedr-1.0.2.zip](/repository.seedr-1.0.2.zip))
+1. Download the repository zip file ([repository.seedr-1.0.2.zip](/repository.seedr/repository.seedr-1.0.2.zip))
 2. In Kodi, go to Add-ons > Install from zip file
 3. Select the downloaded repository.seedr-1.0.2.zip
 4. Wait for the "Add-on installed" notification
@@ -95,8 +95,8 @@ Once the repository is installed:
 
 ## Quick Downloads
 
-👉 **[DOWNLOAD REPOSITORY.SEEDR-1.0.2.ZIP](/repository.seedr-1.0.2.zip)** - Install this first!  
-👉 **[DOWNLOAD PLUGIN.VIDEO.SEEDR-1.2.0.ZIP](/plugin.video.seedr-1.2.0.zip)** - Seedr addon
+👉 **[DOWNLOAD REPOSITORY.SEEDR-1.0.2.ZIP](/repository.seedr/repository.seedr-1.0.2.zip)** - Install this first!  
+👉 **[DOWNLOAD PLUGIN.VIDEO.SEEDR-1.2.0.ZIP](/plugin.video.seedr/plugin.video.seedr-1.2.0.zip)** - Seedr addon
 
 ## Repository Navigation
 
@@ -110,11 +110,11 @@ Once the repository is installed:
 
 ### Repository
 
-- [repository.seedr-1.0.2.zip](/repository.seedr-1.0.2.zip) - Repository ZIP file
+- [repository.seedr-1.0.2.zip](/repository.seedr/repository.seedr-1.0.2.zip) - Repository ZIP file
 
 ### Addon
 
-- [plugin.video.seedr-1.2.0.zip](/plugin.video.seedr-1.2.0.zip) - Seedr Addon ZIP file
+- [plugin.video.seedr-1.2.0.zip](/plugin.video.seedr/plugin.video.seedr-1.2.0.zip) - Seedr Addon ZIP file
 
 ## Usage
 
