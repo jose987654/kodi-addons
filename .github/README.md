@@ -51,12 +51,25 @@ Stream videos, music, and images from your Seedr cloud storage directly to Kodi.
 
 ## Method 1: Direct Download and Install
 
-1. Download the plugin.video zip file ([plugin.video.seedr-1.2.0.zip](../plugin.video.seedr-1.2.0.zip))
+1. Download the plugin.video zip file ([plugin.video.seedr-1.2.0.zip](/plugin.video.seedr-1.2.0.zip))
 2. In Kodi, go to Add-ons > Install from zip file
 3. Select the downloaded zip file
-4. The repository will be installed, and you can then install the Seedr addon from the repository
+4. The addon will be installed directly
 
-## Method 2: Install via File Source
+**Note:** If you have issues with paths containing spaces, copy the ZIP file to a simple path like `D:\kodi-addons-install\` before installing.
+
+## Method 2: Install Repository First, Then Addon
+
+1. Download the repository zip file ([repository.seedr-1.0.2.zip](/repository.seedr-1.0.2.zip))
+2. In Kodi, go to Add-ons > Install from zip file
+3. Select the downloaded repository.seedr-1.0.2.zip
+4. Wait for the "Add-on installed" notification
+5. Go to Add-ons > Install from repository
+6. Select "Seedr Repository"
+7. Navigate to Video Add-ons
+8. Select and install the Seedr addon
+
+## Method 3: Install via File Source (Online)
 
 1. In Kodi, go to Settings > File Manager
 2. Select "Add source"
@@ -136,16 +149,18 @@ To build/update the repository:
 
 **What's New in v1.2.0:**
 
-- Enhanced QR Code Authentication Dialog with bigger, more readable text
-- Fixed Cancel button functionality - now properly exits authentication
-- Improved retry logic - "Yes" properly restarts authentication with new QR code
-- Centered text layout for better user experience
-- Better error handling and user feedback during authentication
+- Fixed critical indentation errors in main.py
+- Improved code stability and reliability
+- Better error handling for authentication flow
+- Enhanced compatibility with Kodi installation process
+- Resolved Python syntax errors preventing addon from loading
 
 **What's New in v1.1.1:**
 
-- Updated icon images
-- Improved user interface
+- Updated to standard semantic versioning
+- Updated fanart images with new Seedr design
+- Improved audio playlist support
+- Enhanced user interface
 
 **What's New in v1.0.6:**
 

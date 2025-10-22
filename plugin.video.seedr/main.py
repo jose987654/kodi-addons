@@ -103,7 +103,7 @@ def get_device_code():
         log(f"Device code response: {response_data}")
         
         if 'device_code' not in response_data:
-        log("Error: No device_code in response", xbmc.LOGERROR)
+            log("Error: No device_code in response", xbmc.LOGERROR)
             return None
         
         log(f"Device Code: {response_data['device_code']}")
@@ -351,7 +351,7 @@ def get_access_token():
             log("User cancelled authentication - exiting")
             settings['cancel_auth'] = False  # Clear the flag
             save_dict(settings, data_file)
-                    return None
+            return None
         
         # Check if we got the token from the dialog
         if 'access_token' in settings and settings['access_token']:
@@ -359,7 +359,7 @@ def get_access_token():
             if 'refresh_token' in settings:
                 refresh_token = settings['refresh_token']
             log("Authentication completed successfully from QR dialog")
-            else:
+        else:
             log("Authentication failed or was cancelled")
             return None
 
