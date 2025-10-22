@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Seedr Plugin - Files</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f6f8fa;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .file-list {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .file-item {
+            padding: 15px;
+            border-bottom: 1px solid #e1e4e8;
+            display: flex;
+            align-items: center;
+        }
+
+        .file-item:last-child {
+            border-bottom: none;
+        }
+
+        .file-item img {
+            margin-right: 10px;
+            width: 24px;
+            height: 24px;
+        }
+
+        .file-item a {
+            color: #0366d6;
+            text-decoration: none;
+            font-size: 1.1em;
+            flex-grow: 1;
+        }
+
+        .file-item a:hover {
+            text-decoration: underline;
+        }
+
+        .file-size {
+            color: #586069;
+            margin-left: 10px;
+        }
+
+        .back-link {
+            color: #0366d6;
+            text-decoration: none;
+            display: inline-block;
+            margin-bottom: 20px;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+
+        .badge {
+            display: inline-block;
+            background: #28a745;
+            color: white;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.85em;
+            margin-left: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <a href="../" class="back-link">← Back to Repository Root</a>
+
+    <div class="header">
+        <h1>🎬 Seedr Kodi Plugin</h1>
+        <p>Stream your Seedr.cc cloud storage directly through Kodi</p>
+        <span class="badge">Version 1.2.0</span>
+    </div>
+
+    <div class="file-list">
+        <h2>Available Files</h2>
+        <div class="file-item">
+            <img src="../icons/compressed.gif" alt="[ZIP]">
+            <a href="plugin.video.seedr-1.2.0.zip">plugin.video.seedr-1.2.0.zip</a>
+            <span class="file-size">Addon Package</span>
+        </div>
+        <div class="file-item">
+            <img src="../icons/blank.gif" alt="[FILE]">
+            <a href="plugin.video.seedr-1.2.0.zip.md5">plugin.video.seedr-1.2.0.zip.md5</a>
+            <span class="file-size">MD5 Checksum</span>
+        </div>
+        <div class="file-item">
+            <img src="../icons/blank.gif" alt="[FILE]">
+            <a href="README.md">README.md</a>
+            <span class="file-size">Documentation</span>
+        </div>
+    </div>
+
+    <div style="margin-top: 20px; padding: 15px; background: #d1ecf1; border-radius: 5px;">
+        <strong>✨ What's New in v1.2.0:</strong>
+        <ul style="margin: 10px 0;">
+            <li>Fixed critical indentation errors in main.py</li>
+            <li>Improved code stability and reliability</li>
+            <li>Better error handling for authentication flow</li>
+            <li>Enhanced compatibility with Kodi installation process</li>
+        </ul>
+    </div>
+
+    <div style="margin-top: 20px; padding: 15px; background: #fff3cd; border-radius: 5px;">
+        <strong>Installation Instructions:</strong>
+        <ol>
+            <li>Download <strong>plugin.video.seedr-1.2.0.zip</strong></li>
+            <li>In Kodi, go to <strong>Add-ons → Install from zip file</strong></li>
+            <li>Select the downloaded file</li>
+            <li>Wait for the installation notification</li>
+        </ol>
+    </div>
+
+    <div style="margin-top: 20px; padding: 15px; background: #f8d7da; border-radius: 5px;">
+        <strong>⚠️ Note:</strong> If you have issues with paths containing spaces, copy the ZIP file to a simple path
+        like <code>D:\kodi-addons-install\</code> before installing.
+    </div>
+</body>
+
+</html>
